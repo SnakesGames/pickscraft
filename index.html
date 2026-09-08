@@ -4,6 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pickscraft — Minigame Server</title>
+<meta name="description" content="PvP, Bedwars, Parkour and more. Java + Bedrock crossplay. Join before it blows up.">
+
+<!-- Open Graph / Discord embed -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pickscraft">
+<meta property="og:title" content="Pickscraft — Minigame Server">
+<meta property="og:description" content="PvP, Bedwars, Parkour and more. Java + Bedrock crossplay. Weekly events & tournaments. Join before it blows up.">
+<meta property="og:url" content="https://pickscraft.net">
+<meta property="og:image" content="https://pickscraft.net/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter card (Discord also reads this) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pickscraft — Minigame Server">
+<meta name="twitter:description" content="PvP, Bedwars, Parkour and more. Java + Bedrock crossplay. Weekly events & tournaments.">
+<meta name="twitter:image" content="https://pickscraft.net/og-image.png">
+
+<!-- Discord embed accent color (left border strip) -->
+<meta name="theme-color" content="#62d966">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;600;700&family=Rubik:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -237,6 +258,44 @@
   }
   .badge .dot{ width:8px; height:8px; background: var(--diamond); }
 
+  /* ---------- UPTIME / STATUS ---------- */
+  .status-grid{
+    display:grid; grid-template-columns: repeat(2, 1fr);
+    gap: 20px; max-width: 760px; margin: 0 auto;
+  }
+  .status-card{
+    background: var(--bg2);
+    border: 2px solid var(--border);
+    padding: 22px;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.35);
+  }
+  .status-top{ display:flex; align-items:center; gap:10px; margin-bottom: 16px; }
+  .status-icon{ font-size: 20px; }
+  .status-server-name{ font-family:'Pixelify Sans'; font-weight:700; font-size:14px; letter-spacing:1px; flex:1; color:#fff; }
+  .status-pill{
+    display:flex; align-items:center; gap:7px;
+    font-family:'Pixelify Sans'; font-weight:700; font-size: 11px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+  }
+  .status-pill .dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .status-pill.loading{ background: rgba(169,176,192,0.1); color: var(--muted); border-color: rgba(169,176,192,0.25); }
+  .status-pill.loading .dot{ background: var(--muted); animation: pulse 1.2s ease-in-out infinite; }
+  .status-pill.online{ background: rgba(98,217,102,0.1); color: var(--grass); border-color: rgba(98,217,102,0.3); }
+  .status-pill.online .dot{ background: var(--grass); box-shadow: 0 0 8px 2px rgba(98,217,102,0.6); animation: pulse 1.6s ease-in-out infinite; }
+  .status-pill.offline{ background: rgba(255,77,77,0.1); color: var(--redstone); border-color: rgba(255,77,77,0.3); }
+  .status-pill.offline .dot{ background: var(--redstone); box-shadow: 0 0 8px 2px rgba(255,77,77,0.5); }
+  .status-ip{ font-size: 12.5px; color: var(--muted); margin-bottom: 12px; word-break: break-all; }
+  .status-meta{ font-size: 12.5px; color: var(--text); font-weight:500; }
+  .status-footnote{
+    text-align:center; margin-top: 24px; font-size: 11px; color: var(--muted);
+    font-family:'JetBrains Mono'; letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 560px){
+    .status-grid{ grid-template-columns: 1fr; }
+  }
+
   /* ---------- SECTION SHARED ---------- */
   section{ padding: 100px 6vw; position:relative; }
   .section-head{ text-align:center; max-width: 680px; margin: 0 auto 56px; }
@@ -395,7 +454,7 @@
   <div class="logo"><div class="logo-block"></div>PICKSCRAFT</div>
   <div class="nav-links">
     <span>play.pickscraft.net</span>
-    <a class="btn btn-ghost" href="https://store.pickscraft.net" target="_blank" rel="noopener">STORE</a>
+    <a class="btn btn-ghost" href="https://pickscraft-shop.tebex.io" target="_blank" rel="noopener">STORE</a>
   </div>
 </nav>
 
@@ -481,11 +540,11 @@
       </div>
       <div class="ip-row bedrock">
         <span class="ip-label"><span class="tag-dot"></span>BEDROCK</span>
-        <span class="ip-value mono">bedrock.pickscraft.net:12568</span>
-        <button onclick="copyIP('bedrock.pickscraft.net:12568', this)">COPY</button>
+        <span class="ip-value mono">209.25.140.16:25961</span>
+        <button onclick="copyIP('209.25.140.16:25961', this)">COPY</button>
       </div>
     </div>
-    <a class="btn btn-gold" href="https://store.pickscraft.net" target="_blank" rel="noopener">VISIT STORE →</a>
+    <a class="btn btn-gold" href="https://pickscraft-shop.tebex.io" target="_blank" rel="noopener">VISIT STORE →</a>
   </div>
 
   <div class="platform-badges">
@@ -493,6 +552,38 @@
     <div class="badge"><span class="dot"></span>BEDROCK EDITION</div>
     <div class="badge"><span class="dot"></span>FULL CROSSPLAY</div>
   </div>
+</section>
+
+<section id="status">
+  <div class="section-head">
+    <div class="section-tag">LIVE STATUS</div>
+    <h2 class="section-title">Server Uptime</h2>
+    <p class="section-sub">Checked automatically every 30 seconds — straight from the servers.</p>
+  </div>
+
+  <div class="status-grid">
+    <div class="status-card">
+      <div class="status-top">
+        <span class="status-icon">☕</span>
+        <span class="status-server-name">JAVA</span>
+        <span class="status-pill loading" id="pillJava"><span class="dot"></span>CHECKING</span>
+      </div>
+      <div class="status-ip mono">play.pickscraft.net</div>
+      <div class="status-meta" id="metaJava">Checking server…</div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-top">
+        <span class="status-icon">📱</span>
+        <span class="status-server-name">BEDROCK</span>
+        <span class="status-pill loading" id="pillBedrock"><span class="dot"></span>CHECKING</span>
+      </div>
+      <div class="status-ip mono">209.25.140.16:25961</div>
+      <div class="status-meta" id="metaBedrock">Checking server…</div>
+    </div>
+  </div>
+
+  <div class="status-footnote" id="statusUpdated">Last checked: —</div>
 </section>
 
 <section id="minigames">
@@ -599,17 +690,17 @@
       </div>
       <div class="ip-row bedrock">
         <span class="ip-label"><span class="tag-dot"></span>BEDROCK</span>
-        <span class="ip-value mono">bedrock.pickscraft.net:12568</span>
-        <button onclick="copyIP('bedrock.pickscraft.net:12568', this)">COPY</button>
+        <span class="ip-value mono">209.25.140.16:25961</span>
+        <button onclick="copyIP('209.25.140.16:25961', this)">COPY</button>
       </div>
     </div>
-    <a class="btn btn-gold" href="https://store.pickscraft.net" target="_blank" rel="noopener">VISIT STORE →</a>
+    <a class="btn btn-gold" href="https://pickscraft-shop.tebex.io" target="_blank" rel="noopener">VISIT STORE →</a>
   </div>
 </section>
 
 <footer>
   <div>© 2026 Pickscraft — Not affiliated with Mojang or Microsoft.</div>
-  <div class="foot-ip">JAVA play.pickscraft.net &nbsp;·&nbsp; BEDROCK bedrock.pickscraft.net:12568</div>
+  <div class="foot-ip">JAVA play.pickscraft.net &nbsp;·&nbsp; BEDROCK 209.25.140.16:25961</div>
 </footer>
 
 <div class="toast" id="toast">IP COPIED TO CLIPBOARD</div>
@@ -633,6 +724,93 @@
       setTimeout(() => toast.classList.remove('show'), 2200);
     });
   }
+
+  // ---------- Live server status ----------
+  // Primary source: status.json pushed to GitHub by the GitHubStatus plugin
+  // running on the Minecraft server. Falls back to mcsrvstat.us (a public
+  // ping service) if that file can't be reached for any reason.
+  const STATUS_REFRESH_MS = 30000;
+
+  // TODO: replace these with your actual GitHub username / repo / branch
+  const GITHUB_STATUS_URL = "https://raw.githubusercontent.com/YOUR-GITHUB-USERNAME/YOUR-REPO-NAME/main/status.json";
+
+  // If the plugin hasn't checked in for this long, treat it as offline even
+  // if the file still says online=true — this catches server crashes where
+  // it never got the chance to send a clean "offline" update.
+  const STALE_AFTER_MS = 15 * 60 * 1000;
+
+  function setPill(pillEl, state, label){
+    pillEl.className = "status-pill " + state;
+    pillEl.innerHTML = '<span class="dot"></span>' + label;
+  }
+
+  function applyCombinedStatus(online, metaText){
+    setPill(document.getElementById("pillJava"), online ? "online" : "offline", online ? "ONLINE" : "OFFLINE");
+    setPill(document.getElementById("pillBedrock"), online ? "online" : "offline", online ? "ONLINE" : "OFFLINE");
+    document.getElementById("metaJava").textContent = metaText;
+    document.getElementById("metaBedrock").textContent = metaText;
+  }
+
+  async function checkViaGitHub(){
+    const res = await fetch(GITHUB_STATUS_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if(!res.ok) throw new Error("status.json not reachable");
+    const data = await res.json();
+
+    const age = Date.now() - new Date(data.lastUpdated).getTime();
+    const isStale = isNaN(age) || age > STALE_AFTER_MS;
+
+    if(data.online && !isStale){
+      const meta = data.players + (data.maxPlayers ? " / " + data.maxPlayers : "") + " players online";
+      applyCombinedStatus(true, meta);
+    } else if(isStale){
+      applyCombinedStatus(false, "No heartbeat recently — likely crashed or offline");
+    } else {
+      applyCombinedStatus(false, "Server is currently offline");
+    }
+  }
+
+  async function checkViaMcsrvstat(){
+    async function ping(apiUrl, pillId, metaId){
+      const pillEl = document.getElementById(pillId);
+      const metaEl = document.getElementById(metaId);
+      try{
+        const res = await fetch(apiUrl, { cache: "no-store" });
+        if(!res.ok) throw new Error("bad response");
+        const data = await res.json();
+        if(data.online){
+          setPill(pillEl, "online", "ONLINE");
+          metaEl.textContent = data.players
+            ? data.players.online + (data.players.max ? " / " + data.players.max : "") + " players online"
+            : "Server is online";
+        } else {
+          setPill(pillEl, "offline", "OFFLINE");
+          metaEl.textContent = "Server is currently offline";
+        }
+      } catch(err){
+        setPill(pillEl, "offline", "OFFLINE");
+        metaEl.textContent = "Couldn't reach status service";
+      }
+    }
+    await Promise.all([
+      ping("https://api.mcsrvstat.us/3/play.pickscraft.net", "pillJava", "metaJava"),
+      ping("https://api.mcsrvstat.us/bedrock/3/209.25.140.16:25961", "pillBedrock", "metaBedrock")
+    ]);
+  }
+
+  async function refreshStatus(){
+    try{
+      await checkViaGitHub();
+    } catch(err){
+      await checkViaMcsrvstat();
+    }
+    const updatedEl = document.getElementById("statusUpdated");
+    if(updatedEl){
+      updatedEl.textContent = "Last checked: " + new Date().toLocaleTimeString();
+    }
+  }
+
+  refreshStatus();
+  setInterval(refreshStatus, STATUS_REFRESH_MS);
 </script>
 
 </body>
