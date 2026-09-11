@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PicksCraft Network &mdash; Legal</title>
+  <style>
+    :root {
+      --bg-base: #e8eaf0;
+      --bg-surface: rgba(255, 255, 255, 0.65);
+      --bg-surface-solid: #ffffff;
+      --accent: #0066cc;
+      --text-main: #1d1d1f;
+      --text-muted: #515154;
+      --border-outer: rgba(0, 0, 0, 0.12);
+      --border-highlight: rgba(255, 255, 255, 0.9);
+      --shadow-raised: 
+        0 10px 30px rgba(0, 0, 0, 0.08), 
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+      --shadow-inset: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.12),
+        inset 0 0 1px rgba(0, 0, 0, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 70%),
+        radial-gradient(circle at 80% 100%, rgba(200, 210, 225, 0.5) 0%, transparent 50%);
+      color: var(--text-main);
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container { width: 100%; max-width: 800px; }
+
+    .header-nav {
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--border-outer);
+      border-top: 1px solid var(--border-highlight);
+      border-radius: 16px;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-raised);
+    }
+
+    .brand { 
+      font-weight: 700; 
+      letter-spacing: -0.01em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .nav-tabs { 
+      display: flex; 
+      gap: 4px; 
+      background: rgba(0, 0, 0, 0.06);
+      padding: 4px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-inset);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 6px 18px;
+      cursor: pointer;
+      border-radius: 7px;
+      transition: all 0.15s ease;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .tab-btn.active {
+      color: var(--text-main);
+      background: linear-gradient(180deg, #ffffff 0%, #f0f0f3 100%);
+      font-weight: 600;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-top: 1px solid #ffffff;
+      box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.12), 
+        0 1px 1px rgba(0, 0, 0, 0.08);
+      text-shadow: none;
+    }
+
+    .doc-section {
+      display: none;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 252, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-outer);
+      border-top: 1px solid var(--border-highlight);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-raised);
+    }
+
+    .doc-section.active { display: block; }
+
+    h1 { 
+      font-size: 1.8rem; 
+      margin-bottom: 8px; 
+      letter-spacing: -0.015em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    h2 { 
+      font-size: 1.1rem; 
+      margin-top: 28px; 
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    p, li { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 12px; }
+    ul { padding-left: 20px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .uppercase-text {
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    footer { 
+      margin-top: 28px; 
+      text-align: center; 
+      font-size: 0.8rem; 
+      color: var(--text-muted);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-nav">
+    <div class="brand">PicksCraft Network</div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="btn-tos" onclick="switchTab('tos')">Terms</button>
+      <button class="tab-btn" id="btn-privacy" onclick="switchTab('privacy')">Privacy</button>
+    </div>
+  </div>
+
+  <div id="tos" class="doc-section active">
+    <h1>Terms of Service</h1>
+    <p>By connecting to, accessing, or interacting with <strong>PicksCraft Network</strong> (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to all terms and conditions, you must immediately disconnect and cease all use of the Service.</p>
+
+    <h2>1. Acceptance and Eligibility</h2>
+    <p>By using the Service, you represent and warrant that you are of legal age to form a binding contract in your jurisdiction, or, if you are a minor, that you have obtained verifiable and explicit consent from a parent or legal guardian who agrees to be bound by these Terms on your behalf.</p>
+
+    <h2>2. Intellectual Property & Mojang Disclaimers</h2>
+    <p>PicksCraft Network is NOT AN OFFICIAL MINECRAFT PRODUCT. WE ARE NOT APPROVED BY, ASSOCIATED WITH, OR SUPPORTED BY MOJANG SYNERGIES AB OR MICROSOFT CORPORATION. The Minecraft name, brand, and assets are the property of their respective owners. By using our Service, you agree to fully comply with the official <a href="https://www.minecraft.net/en-us/eula" target="_blank">Minecraft End User License Agreement (EULA)</a>. Any User-Generated Content you create on the network grants us a non-exclusive, perpetual, irrevocable, royalty-free license to use, reproduce, modify, and display such content.</p>
+
+    <h2>3. Virtual Goods, Currency, and Purchases</h2>
+    <ul>
+      <li><strong>No Monetary Value:</strong> All virtual items, ranks, currencies, tokens, cosmetics, or digital goods obtained on the Service remain the sole property of PicksCraft Network. They hold absolutely no real-world monetary value and may not be traded, sold, or exchanged outside of the Service.</li>
+      <li><strong>Final Sale & Revocability:</strong> All transactions are final. No refunds will be provided under any circumstances. We reserve the absolute right to modify, suspend, or revoke access to any virtual goods at any time, with or without cause or notice.</li>
+      <li><strong>Chargebacks:</strong> Initiating an unauthorized chargeback, payment dispute, or reversal will result in the immediate and permanent termination of your account and access to the Service.</li>
+    </ul>
+
+    <h2>4. Code of Conduct and Acceptable Use</h2>
+    <p>You agree not to engage in any activity that interferes with or disrupts the Service. Prohibited actions include, but are not limited to:</p>
+    <ul>
+      <li>Utilizing unauthorized third-party modifications, clients, scripts, macros, or cheats that provide an unfair advantage.</li>
+      <li>Exploiting bugs, glitches, or server vulnerabilities.</li>
+      <li>Distributing malicious code, participating in DDoS attacks, or intentionally causing network instability.</li>
+      <li>Engaging in harassment, hate speech, doxxing, real-money trading (RMT), or any unlawful behavior.</li>
+    </ul>
+
+    <h2>5. Termination and Access Restriction</h2>
+    <p>We reserve the unilateral right to suspend, terminate, or ban your access to the Service at our sole and absolute discretion, at any time, for any reason, without notice or liability. If banned, you forfeit all rights to virtual goods and associated data.</p>
+
+    <h2>6. Indemnification</h2>
+    <p>You agree to indemnify, defend, and hold harmless PicksCraft Network, its owners, administrators, staff, and affiliates from any claims, damages, liabilities, costs, or expenses (including legal fees) arising from your use of the Service or your violation of these Terms.</p>
+
+    <h2>7. Disclaimer of Warranties</h2>
+    <p class="uppercase-text">THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS. WE EXPRESSLY DISCLAIM ALL WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, OR ERROR-FREE, OR THAT ANY DATA WILL BE PRESERVED.</p>
+
+    <h2>8. Limitation of Liability</h2>
+    <p class="uppercase-text">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL PICKSCRAFT NETWORK BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, REVENUE, DATA, OR VIRTUAL ASSETS INCURRED, WHETHER DIRECTLY OR INDIRECTLY, ARISING OUT OF YOUR ACCESS TO OR USE OF THE SERVICE. OUR TOTAL AGGREGATE LIABILITY TO YOU FOR ANY CLAIMS UNDER THESE TERMS SHALL NOT EXCEED THE AMOUNT YOU PAID TO US IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.</p>
+
+    <h2>9. Dispute Resolution and Arbitration</h2>
+    <p>Any dispute, claim, or controversy arising out of or relating to these Terms or the breach thereof shall be settled by binding arbitration, rather than in court. You agree to waive any right to participate in a class action lawsuit or class-wide arbitration.</p>
+
+    <h2>10. Severability and Entire Agreement</h2>
+    <p>If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that the Terms will otherwise remain in full force and effect. These Terms constitute the entire agreement between you and PicksCraft Network.</p>
+  </div>
+
+  <div id="privacy" class="doc-section">
+    <h1>Privacy Policy</h1>
+    <p>This Privacy Policy explains how PicksCraft Network collects, uses, discloses, and safeguards your information when you access our multiplayer network and digital infrastructure.</p>
+
+    <h2>1. Information We Collect</h2>
+    <p>We strictly limit data collection to the minimum required for operational functionality, gameplay persistence, and network security:</p>
+    <ul>
+      <li><strong>Account Identifiers:</strong> Your official Minecraft Account ID (UUID) is logged to bind your gameplay progress, ranks, virtual inventory, and moderation history across our network.</li>
+      <li><strong>Profile Metadata:</strong> Publicly available authentication data provided securely through Mojang/Microsoft APIs, including your current display username and digital skin textures.</li>
+      <li><strong>Network Telemetry:</strong> Your Public IP Address is processed and temporarily stored for routing server traffic, mitigating Distributed Denial of Service (DDoS) attacks, regional latency optimization, and enforcing administrative bans or security blocks.</li>
+      <li><strong>Gameplay Analytics:</strong> In-game actions, chat logs, command execution, and interaction metrics are recorded for moderation, anti-cheat detection, and service improvement.</li>
+    </ul>
+
+    <h2>2. Information We Explicitly DO NOT Collect</h2>
+    <p>We maintain a strict boundary regarding sensitive personal data:</p>
+    <ul>
+      <li><strong>Authentication Credentials:</strong> We never intercept, process, request, or store your Minecraft or Microsoft account passwords. All authentication utilizes secure OAuth token handshakes directly with Microsoft's official servers.</li>
+      <li><strong>Local Network Data:</strong> We do not index your Private/Local IP Address, MAC address, or hardware configurations beyond what the standard Minecraft client transmits natively.</li>
+      <li><strong>Personally Identifiable Information (PII):</strong> We do not collect real-world names, physical addresses, governmental IDs, telephone numbers, or offline demographic profiles.</li>
+    </ul>
+
+    <h2>3. How We Use Your Information</h2>
+    <p>Collected data is leveraged exclusively to:</p>
+    <ul>
+      <li>Provide, operate, and maintain server infrastructure.</li>
+      <li>Ensure fair play through automated and manual anti-cheat heuristics.</li>
+      <li>Enforce the Terms of Service and apply necessary moderation actions.</li>
+      <li>Defend against malicious cyber-attacks and infrastructural abuse.</li>
+    </ul>
+
+    <h2>4. Data Disclosure and Third-Party Providers</h2>
+    <p>PicksCraft Network does not sell, rent, or trade your data to advertising agencies or external data brokers. However, network metadata (such as IP addresses) may be routed through third-party infrastructure providers solely for the purposes of server hosting, firewall management, and enterprise DDoS mitigation. We may also disclose data if legally required to do so by court order or law enforcement request.</p>
+
+    <h2>5. Data Retention</h2>
+    <p>Account IDs and gameplay data are retained indefinitely to ensure persistent progress upon your return. Security logs and IP routing histories are automatically rotated and purged in accordance with our internal data retention cycles, unless required for active moderation or legal compliance.</p>
+
+    <h2>6. Your Privacy Rights</h2>
+    <p>Depending on your jurisdiction (e.g., GDPR in the EU, CCPA in California), you may have the right to request access to, correction of, or erasure of your stored digital footprint. Such requests must be mathematically verified to ensure you own the Minecraft account in question before processing can begin.</p>
+
+    <h2>7. Children's Privacy (COPPA)</h2>
+    <p>We do not knowingly collect personal information from children under the age of 13 without verified parental consent. If we become aware that we have inadvertently collected such data, we will take reasonable steps to delete it from our systems immediately.</p>
+  </div>
+
+  <footer>&copy; 2026 PicksCraft Network. Not affiliated with Mojang AB or Microsoft Corporation.</footer>
+</div>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.doc-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.getElementById('btn-' + tabId).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
