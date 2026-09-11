@@ -5,7 +5,7 @@
 const API = (() => {
   // On Cloudflare Pages + Render, set window.REALMCRAFT_API to your Render
   // URL (e.g. https://realmcraft-api.onrender.com) before this script loads.
-  const BASE = window.REALMCRAFT_API || '';
+  const BASE = window.REALMCRAFT_API || 'https://pickscraft-api.onrender.com';
 
   async function req(method, path, body, extraHeaders = {}) {
     const opts = {
