@@ -1,0 +1,640 @@
+{
+  "_readme": "pickscraft",
+  "server": {
+    "name": "pickscraft",
+    "ip": "play.pickscraft.net",
+    "port": 56282,
+    "version": "1.17-26.2+",
+    "tagline": "The ultimate Minecraft network. Built for legends.",
+    "discord": "https://discord.gg/G453z5u5t5",
+    "store": "/store.html",
+    "website": "https://pickscraft.net",
+    "maxPlayers": 500,
+    "logoUrl": "assets/images/logo.png",
+    "faviconUrl": "assets/images/logo.png"
+  },
+  "backend": {
+    "port": 3001,
+    "adminPassword": "admin1352",
+    "webhookSecret": "",
+    "statusCacheSecs": 30,
+    "_note": "Change adminPassword before going live!"
+  },
+  "theme": {
+    "accentJade": "#00e5a0",
+    "accentAmber": "#ff8c00",
+    "accentIce": "#a8d4ff",
+    "bgVoid": "#08090b"
+  },
+  "homepageStats": {
+    "registeredPlayers": 5291,
+    "uptime": "99.7%"
+  },
+  "announcement": {
+    "enabled": true,
+    "text": "🎉 Season 2 launches in 2 wweeks! Vote now to earn a head-start Key!",
+    "type": "info"
+  },
+  "gameModes": [
+    {
+      "id": "survival",
+      "name": "THE Survival",
+      "tag": "PVE / PVP",
+      "players": 102,
+      "badge": "jade"
+    },
+    {
+      "id": "skyblock",
+      "name": "Better Skyblock",
+      "tag": "ECONOMY",
+      "players": 87,
+      "badge": "ice"
+    },
+    {
+      "id": "Duels",
+      "name": "PVP Duels",
+      "tag": "DUEL PVP",
+      "players": 24,
+      "badge": "red"
+    },
+    {
+      "id": "prison",
+      "name": "OP Prison",
+      "tag": "SOON!",
+      "players": 65,
+      "badge": "amber"
+    }
+  ],
+  "voteSites": [
+    {
+      "id": "planetmc",
+      "name": "Planet Minecraft",
+      "icon": "",
+      "url": "https://www.planetminecraft.com/",
+      "reward": "Vote Key + 1,000 Coins",
+      "cooldownHours": 24
+    },
+    {
+      "id": "mcservers",
+      "name": "MC-Servers.org",
+      "icon": "",
+      "url": "",
+      "reward": "250 Coins + XP Boost",
+      "cooldownHours": 24
+    },
+    {
+      "id": "topg",
+      "name": "TopG.org",
+      "icon": "",
+      "url": "",
+      "reward": "Bonus Chest + 500 Coins",
+      "cooldownHours": 12
+    },
+    {
+      "id": "mclist",
+      "name": "Minecraft-List.org",
+      "icon": "",
+      "url": "",
+      "reward": "150 Coins + Community XP",
+      "cooldownHours": 24
+    },
+    {
+      "id": "serverpact",
+      "name": "ServerPact",
+      "icon": "",
+      "url": "",
+      "reward": "Vote Key + 200 Coins",
+      "cooldownHours": 24
+    },
+    {
+      "id": "bestmc",
+      "name": "Best-Minecraft-Servers",
+      "icon": "",
+      "url": "",
+      "reward": "Rank Booster + 100 Coins",
+      "cooldownHours": 24
+    }
+  ],
+  "votePartyGoal": 200,
+  "votePartyReward": "1× Legend Key to everyone online",
+  "rewards": {
+    "voteInterval": 10,
+    "milestones": [
+      {
+        "votes": 10,
+        "name": "Vote Key",
+        "icon": "key",
+        "rarity": "Common"
+      },
+      {
+        "votes": 50,
+        "name": "Elite Crate",
+        "icon": "gem",
+        "rarity": "Uncommon"
+      },
+      {
+        "votes": 100,
+        "name": "Rare Chest",
+        "icon": "star",
+        "rarity": "Rare"
+      },
+      {
+        "votes": 500,
+        "name": "Legend Crate",
+        "icon": "crown",
+        "rarity": "Legendary"
+      }
+    ],
+    "streakRewards": [
+      {
+        "streak": 3,
+        "name": "Bonus Vote Key",
+        "icon": "key",
+        "rarity": "Common"
+      },
+      {
+        "streak": 7,
+        "name": "Elite Crate",
+        "icon": "gem",
+        "rarity": "Uncommon"
+      },
+      {
+        "streak": 14,
+        "name": "Rare Treasure",
+        "icon": "star",
+        "rarity": "Rare"
+      },
+      {
+        "streak": 30,
+        "name": "Legend Chest",
+        "icon": "crown",
+        "rarity": "Legendary"
+      }
+    ]
+  },
+  "communityGoals": [
+    {
+      "votes": 100,
+      "reward": "Bonus XP Hour",
+      "reached": true
+    },
+    {
+      "votes": 250,
+      "reward": "Double XP Weekend",
+      "reached": true
+    },
+    {
+      "votes": 500,
+      "reward": "Community Crate Drop",
+      "reached": false
+    },
+    {
+      "votes": 1000,
+      "reward": "Server-wide Celebration",
+      "reached": false
+    }
+  ],
+  "achievements": [
+    {
+      "id": "first_vote",
+      "name": "First Vote",
+      "description": "Cast your very first vote.",
+      "icon": "ballot",
+      "rarity": "Common",
+      "condition": "votes>=1"
+    },
+    {
+      "id": "streak_3",
+      "name": "On a Roll",
+      "description": "Maintain a 3-day streak.",
+      "icon": "fire",
+      "rarity": "Common",
+      "condition": "streak>=3"
+    },
+    {
+      "id": "streak_7",
+      "name": "Week Warrior",
+      "description": "7-day voting streak.",
+      "icon": "bolt",
+      "rarity": "Uncommon",
+      "condition": "streak>=7"
+    },
+    {
+      "id": "streak_14",
+      "name": "Fortnight Faithful",
+      "description": "14-day voting streak.",
+      "icon": "moon",
+      "rarity": "Rare",
+      "condition": "streak>=14"
+    },
+    {
+      "id": "streak_30",
+      "name": "Lunar Loyal",
+      "description": "30-day voting streak.",
+      "icon": "star",
+      "rarity": "Epic",
+      "condition": "streak>=30"
+    },
+    {
+      "id": "votes_10",
+      "name": "Getting Started",
+      "description": "Cast 10 lifetime votes.",
+      "icon": "leaf",
+      "rarity": "Common",
+      "condition": "votes>=10"
+    },
+    {
+      "id": "votes_100",
+      "name": "Centurion",
+      "description": "Cast 100 lifetime votes.",
+      "icon": "target",
+      "rarity": "Uncommon",
+      "condition": "votes>=100"
+    },
+    {
+      "id": "votes_500",
+      "name": "Vote Veteran",
+      "description": "Cast 500 lifetime votes.",
+      "icon": "star",
+      "rarity": "Rare",
+      "condition": "votes>=500"
+    },
+    {
+      "id": "votes_1000",
+      "name": "Legend of the Realm",
+      "description": "Cast 1000 lifetime votes.",
+      "icon": "crown",
+      "rarity": "Legendary",
+      "condition": "votes>=1000"
+    },
+    {
+      "id": "all_sites",
+      "name": "Realm Pilgrim",
+      "description": "Vote on all sites in one day.",
+      "icon": "globe",
+      "rarity": "Epic",
+      "condition": "allSites"
+    }
+  ],
+  "levels": [
+    {
+      "min": 0,
+      "level": 1,
+      "title": "New Adventurer",
+      "icon": "leaf"
+    },
+    {
+      "min": 10,
+      "level": 2,
+      "title": "Aspiring Voter",
+      "icon": "sword"
+    },
+    {
+      "min": 50,
+      "level": 3,
+      "title": "Loyal Supporter",
+      "icon": "shield"
+    },
+    {
+      "min": 100,
+      "level": 4,
+      "title": "Village Guardian",
+      "icon": "castle"
+    },
+    {
+      "min": 250,
+      "level": 5,
+      "title": "Knight of the Realm",
+      "icon": "bolt"
+    },
+    {
+      "min": 500,
+      "level": 6,
+      "title": "Realm Defender",
+      "icon": "star"
+    },
+    {
+      "min": 750,
+      "level": 7,
+      "title": "Dedicated Supporter",
+      "icon": "star"
+    },
+    {
+      "min": 1000,
+      "level": 8,
+      "title": "Elite Voter",
+      "icon": "gem"
+    },
+    {
+      "min": 1500,
+      "level": 9,
+      "title": "Realm Champion",
+      "icon": "star"
+    },
+    {
+      "min": 2000,
+      "level": 10,
+      "title": "Living Legend",
+      "icon": "crown"
+    }
+  ],
+  "leaderboard": {
+    "size": 10,
+    "badges": [
+      "crown",
+      "gem",
+      "fire",
+      "shield",
+      "sword",
+      "trophy",
+      "star",
+      "gear",
+      "target",
+      "moon"
+    ]
+  },
+  "flavorMessages": [
+    "thanks to all the loyal supporters.",
+    "Every vote forges a stronger network for all.",
+    "Your loyalty echoes through the stone halls of legend.",
+    "Warriors of the vote, the server salutes you.",
+    "Another vote cast, another legend written in the stars."
+  ],
+  "ranks": [
+    {
+      "id": "wanderer",
+      "name": "Wanderer",
+      "icon": "leaf",
+      "colorClass": "rune",
+      "price": 0,
+      "period": "Free for all players",
+      "current": true,
+      "features": [
+        "Access to all game modes",
+        "2 homes",
+        "Basic chat formatting",
+        "Vote rewards"
+      ],
+      "lockedFeatures": [
+        "Custom nick",
+        "Priority queue",
+        "Fly in lobby"
+      ],
+      "checkoutUrl": ""
+    },
+    {
+      "id": "knight",
+      "name": "Knight",
+      "icon": "sword",
+      "colorClass": "jade",
+      "price": 9.99,
+      "period": "One-time · Permanent",
+      "current": false,
+      "features": [
+        "Everything in Wanderer",
+        "5 homes",
+        "Custom nickname",
+        "1 cosmetic slot",
+        "Jade tag in chat",
+        "Vote key bonus (×2)",
+        "Priority queue"
+      ],
+      "lockedFeatures": [],
+      "checkoutUrl": "https://checkout.tebex.io/checkout/package/1234"
+    },
+    {
+      "id": "champion",
+      "name": "Champion",
+      "icon": "shield",
+      "colorClass": "amber",
+      "price": 24.99,
+      "period": "One-time · Permanent",
+      "current": false,
+      "featured": true,
+      "featuredLabel": "Most Popular",
+      "features": [
+        "Everything in Knight",
+        "15 homes",
+        "Fly in all lobby areas",
+        "3 cosmetic slots",
+        "Amber glowing tag",
+        "Weekly bonus crate",
+        "2× coin earning rate"
+      ],
+      "lockedFeatures": [],
+      "checkoutUrl": ""
+    },
+    {
+      "id": "legend",
+      "name": "Legend",
+      "icon": "👑",
+      "colorClass": "red",
+      "price": 49.99,
+      "period": "One-time · Permanent",
+      "current": false,
+      "features": [
+        "Everything in Champion",
+        "Unlimited homes",
+        "All cosmetic slots",
+        "Animated fire tag",
+        "Daily Legend crate"
+      ],
+      "lockedFeatures": [],
+      "checkoutUrl": ""
+    }
+  ],
+  "forumCategories": [
+    {
+      "id": "news",
+      "name": "News & Announcements",
+      "group": "Official Information"
+    },
+    {
+      "id": "events",
+      "name": "Events & Giveaways",
+      "group": "Official Information"
+    },
+    {
+      "id": "staff",
+      "name": "Staff & Moderation",
+      "group": "Official Information"
+    },
+    {
+      "id": "general",
+      "name": "General Discussion",
+      "group": "The Community"
+    },
+    {
+      "id": "suggestions",
+      "name": "Suggestions",
+      "group": "The Community"
+    },
+    {
+      "id": "media",
+      "name": "Media Showcase",
+      "group": "The Community"
+    },
+    {
+      "id": "recruitment",
+      "name": "Player Recruitment",
+      "group": "The Community"
+    },
+    {
+      "id": "survival",
+      "name": "THE Survival",
+      "group": "Game Modes"
+    },
+    {
+      "id": "skyblock",
+      "name": "Better Skyblock",
+      "group": "Game Modes"
+    },
+    {
+      "id": "Duels",
+      "name": "PVP Duels",
+      "group": "Game Modes"
+    },
+    {
+      "id": "prison",
+      "name": "SOON!",
+      "group": "Game Modes"
+    }
+  ],
+  "staffTeam": [
+    {
+      "username": "snake_best",
+      "role": "Owner",
+      "tagline": "CEO and dev at Pickscraft."
+    },
+    {
+      "username": "MrRykz",
+      "role": "Owner",
+      "tagline": "Handles bans, appeals, and server policy."
+    },
+    {
+      "username": "Moniumm",
+      "role": "Owner",
+      "tagline": "Helps make gamemodes and builds the ranks and plugins code."
+    },
+    {
+      "username": "devs150",
+      "role": "Owner",
+      "tagline": "Handles backend server support and helps make pickscraft a better server."
+    },
+        {
+      "username": "COZY_CRAFTmc",
+      "role": "Manager",
+      "tagline": "Handles bans, appeals, and tickets"
+    }
+  ],
+  "staffPositions": [
+    {
+      "id": "moderator",
+      "name": "Moderator",
+      "description": "Chat moderation, player reports, basic support."
+    },
+    {
+      "id": "builder",
+      "name": "Builder",
+      "description": "Design and build for events and spawn areas."
+    },
+    {
+      "id": "helper",
+      "name": "Helper",
+      "description": "Answer questions, guide new players, no punishment powers."
+    }
+  ],
+  "crates": [
+    {
+      "id": "vote",
+      "name": "Vote Crate",
+      "icon": "ballot",
+      "description": "Common items, XP boosts, and coin bundles. Great for new players building their economy.",
+      "priceLabel": "Free via voting",
+      "type": "link",
+      "href": "vote.html",
+      "linkLabel": "Vote to earn",
+      "colorClass": "jade"
+    },
+    {
+      "id": "elite",
+      "name": "Elite Crate",
+      "icon": "gem",
+      "description": "Rare enchantment books, custom weapons, and exclusive cosmetic pieces.",
+      "priceLabel": "$4.99 / key",
+      "checkoutUrl": "https://checkout.tebex.io/checkout/package/5678",
+      "colorClass": "amber"
+    },
+    {
+      "id": "legend",
+      "name": "Legend Crate",
+      "icon": "shield",
+      "description": "Legendary gear, exclusive pets, animated cosmetics, and rare rank upgrades.",
+      "priceLabel": "$9.99 / key",
+      "checkoutUrl": "",
+      "colorClass": "red"
+    }
+  ],
+  "coinBundles": [
+    {
+      "id": "Skyblock c1000",
+      "amount": 1000,
+      "price": 1.99,
+      "bonus": 0,
+      "checkoutUrl": "https://checkout.tebex.io/checkout/package/9999"
+    },
+    {
+      "id": "Skyblock c5000",
+      "amount": 5000,
+      "price": 7.99,
+      "bonus": 500,
+      "checkoutUrl": ""
+    },
+    {
+      "id": "Skyblock c15000",
+      "amount": 15000,
+      "price": 19.99,
+      "bonus": 3000,
+      "checkoutUrl": "",
+      "popular": true,
+      "popularLabel": "Best Value"
+    },
+    {
+      "id": "Skyblock c50000",
+      "amount": 50000,
+      "price": 49.99,
+      "bonus": 15000,
+      "checkoutUrl": ""
+    },
+    {
+      "id": "Survival c1000",
+      "amount": 1000,
+      "price": 1.99,
+      "bonus": 0,
+      "checkoutUrl": "https://checkout.tebex.io/checkout/package/9999"
+    },
+    {
+      "id": "Survival c5000",
+      "amount": 5000,
+      "price": 7.99,
+      "bonus": 500,
+      "checkoutUrl": ""
+    },
+    {
+      "id": "Survival c15000",
+      "amount": 15000,
+      "price": 19.99,
+      "bonus": 3000,
+      "checkoutUrl": "",
+      "popular": true,
+      "popularLabel": "Best Value"
+    },
+    {
+      "id": "Survival c50000",
+      "amount": 50000,
+      "price": 49.99,
+      "bonus": 15000,
+      "checkoutUrl": ""
+    }
+  ]
+}

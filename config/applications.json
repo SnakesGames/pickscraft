@@ -1,0 +1,16 @@
+{
+  "applications": {
+    "1": {
+      "id": "1",
+      "username": "ENMPlayz",
+      "age": 19,
+      "position": "moderator",
+      "discord": "enmplayz#0123",
+      "experience": "I was a Helper on a 50-player survival network for six months, managing chat filters and welcoming new players daily.",
+      "whyYou": "Because I genuinely enjoy helping communities enjoy. I’m patient and understand that being staff isn't about flexing or anything, it's about making sure everyone else is having a safe, fun experience. I’ve spent a lot of time playing on this server and I’ve noticed the peak hours where chat gets a bit chaotic when current staff are offline.",
+      "status": "accepted",
+      "submittedAt": "2026-07-06T07:38:00.429Z"
+    }
+  },
+  "nextId": 2
+}

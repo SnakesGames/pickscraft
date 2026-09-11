@@ -1,0 +1,48 @@
+{
+  "Minechuckle": {
+    "username": "Minechuckle",
+    "lifetimeVotes": 0,
+    "weeklyVotes": 0,
+    "todayVotes": 0,
+    "streak": 0,
+    "lastVoteTimestamp": null,
+    "lastVoteDate": "2026-08-03",
+    "lastVoteWeek": "2026-W32",
+    "rewardsEarned": 0,
+    "rewardsClaimed": 0,
+    "votedSitesToday": [],
+    "createdAt": "2026-07-04T04:01:33.179Z"
+  },
+  "Kraken": {
+    "username": "Kraken",
+    "lifetimeVotes": 2,
+    "weeklyVotes": 2,
+    "todayVotes": 2,
+    "streak": 1,
+    "lastVoteTimestamp": "2026-07-06T07:20:46.147Z",
+    "lastVoteDate": "2026-07-06",
+    "lastVoteWeek": "2026-W28",
+    "rewardsEarned": 0,
+    "rewardsClaimed": 0,
+    "votedSitesToday": [
+      "planetmc"
+    ],
+    "createdAt": "2026-07-04T09:34:01.260Z"
+  },
+  "Test": {
+    "username": "Test",
+    "lifetimeVotes": 1,
+    "weeklyVotes": 1,
+    "todayVotes": 1,
+    "streak": 1,
+    "lastVoteTimestamp": "2026-07-07T19:22:32.817Z",
+    "lastVoteDate": "2026-07-07",
+    "lastVoteWeek": "2026-W28",
+    "rewardsEarned": 0,
+    "rewardsClaimed": 0,
+    "votedSitesToday": [
+      "planetmc"
+    ],
+    "createdAt": "2026-07-07T19:22:32.645Z"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "users": {
+    "minechuckle": {
+      "username": "Minechuckle",
+      "salt": "49291424a88e6069468ad9e42f3837ed",
+      "hash": "a7bd3cf5008058336237ce31c215b72dcbb7282b1a4af703ae6d7b2351e6478f52f576e8689c226e5f1e46dfb419f02daf88f1c77b8583cb4db7217143f84250",
+      "joinedAt": "2026-07-05T10:31:32.320Z",
+      "postCount": 1
+    },
+    "kraken": {
+      "username": "Kraken",
+      "salt": "48a945fe0b0f02ad60dd234e908dd2aa",
+      "hash": "f0e404e30d01fc7b5621fd67339292bf626b2ae3a1d37360c1a964a2d8a8c4696a0531a695eae263b6dcd34a2d9938dda0dff4c9669264b3f95b5951822a147b",
+      "joinedAt": "2026-07-06T07:33:10.330Z",
+      "postCount": 1
+    },
+    "test": {
+      "username": "Test",
+      "salt": "33e2c97b19d053c5f6b4b145d6260666",
+      "hash": "11a5f5aaa876506f2bf1146bba03e49ed6ba174eae4507dfdcc55013fe1939b938268d8bcfaf2be64a44d448c8705d60efa36c4afdfee3f2719d9f599e04069e",
+      "joinedAt": "2026-07-07T19:22:47.399Z",
+      "postCount": 1
+    }
+  },
+  "threads": {
+    "1": {
+      "id": "1",
+      "category": "general",
+      "title": "Welcome!",
+      "author": "Minechuckle",
+      "createdAt": "2026-07-06T07:27:45.551Z",
+      "lastPostAt": "2026-07-07T19:22:56.838Z",
+      "replyCount": 2
+    }
+  },
+  "posts": {
+    "1": {
+      "id": "1",
+      "threadId": "1",
+      "author": "Minechuckle",
+      "body": "Hello everyone!",
+      "createdAt": "2026-07-06T07:27:45.551Z"
+    },
+    "2": {
+      "id": "2",
+      "threadId": "1",
+      "author": "Kraken",
+      "body": "hii",
+      "createdAt": "2026-07-06T07:33:20.477Z"
+    },
+    "3": {
+      "id": "3",
+      "threadId": "1",
+      "author": "Test",
+      "body": "hello",
+      "createdAt": "2026-07-07T19:22:56.838Z"
+    }
+  },
+  "nextThreadId": 2,
+  "nextPostId": 4
+}
