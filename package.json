@@ -1,37 +1,12 @@
 {
-  "name": "Pickscraft",
-  "version": "1.0.0",
-  "description": "Pickscraft — Full-Stack Minecraft Server Website with Live Status + Vote System",
-  "main": "backend/server.js",
+  "name": "pickscraft-network-website",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pickscraft Network website and game API (Unity sends all requests here).",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "node server.js",
+    "start": "node server.js"
   },
-  "nodemonConfig": {
-    "ignore": [
-      "config/players.json",
-      "config/forum.json",
-      "config/applications.json",
-      "config/config.backup.json",
-      "backend/addons/**/data.json"
-    ]
-  },
-  "dependencies": {
-    "cors": "^2.8.6",
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "keywords": [
-    "minecraft",
-    "server",
-    "website",
-    "voting",
-    "express"
-  ],
-  "license": "MIT"
+  "engines": { "node": ">=18" }
 }

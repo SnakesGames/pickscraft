@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pickscraft Network</title>
+  <meta name="description" content="Pickscraft Network: hang out, play games and build rooms with friends in VR, on desktop and on mobile.">
+  <link rel="icon" href="assets/logo-square.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/"><img src="assets/logo-square.png" alt=""><span>Pickscraft<b>Network</b></span></a>
+    <nav id="nav">
+      <a href="#/rooms">Rooms</a>
+      <a href="#/friends" data-auth>Friends</a>
+      <a href="#/me" data-auth>Profile</a>
+      <a href="#/creator" data-auth>Creator</a>
+      <a href="#/admin" data-admin hidden>Admin</a>
+      <a href="#/me" id="balance" class="balance" hidden title="Your Tokens"></a>
+      <a href="#/login" data-guest class="btn small ghost">Log in</a>
+      <a href="#/signup" data-guest class="btn small">Sign up</a>
+      <button id="logout" data-auth class="btn small ghost">Log out</button>
+    </nav>
+  </header>
+  <div id="setup-banner" class="banner" hidden>
+    The server isn't connected to the database yet: set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> (see README.md).
+  </div>
+  <main id="app" aria-live="polite"></main>
+  <div id="toast" role="status"></div>
+  <footer class="footer">Pickscraft Network &middot; made by players, for players</footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
