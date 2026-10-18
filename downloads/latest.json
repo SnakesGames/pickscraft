@@ -1,0 +1,8 @@
+{
+  "version": "0.0.0",
+  "url": "PickscraftNetwork-0.0.0.zip",
+  "sha256": "",
+  "size": 0,
+  "exe": "Pickscraft Network.exe",
+  "notes": "Placeholder - run Launcher/make-release.ps1 after building the game to publish a real version."
+}
