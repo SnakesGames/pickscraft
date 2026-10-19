@@ -1,4 +1,4 @@
-// Local server: serves the website AND the /api on one port.
+// Local test server (Vercel does NOT use this file): serves public/ AND the /api on one port.
 //   npm run dev   ->  http://localhost:3000   (Unity's PickscraftConfig.json points here while testing)
 // Reads settings from a .env file next to this one (copy .env.example to .env).
 import http from 'node:http';
@@ -6,8 +6,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.dirname(fileURLToPath(import.meta.url));
-const envFile = path.join(root, '.env');
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.join(here, 'public'); // website files (Vercel serves this folder too)
+const envFile = path.join(here, '.env');
 if (fs.existsSync(envFile))
   for (const line of fs.readFileSync(envFile, 'utf8').split(/\r?\n/)) {
     const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);

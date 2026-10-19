@@ -3,10 +3,11 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Pickscraft Network website and game API (Unity sends all requests here).",
+  "description": "Pickscraft Network website (public/) and game API (api/ + lib/). Unity sends all requests to /api.",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js"
+    "dev": "node dev-server.js"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }
