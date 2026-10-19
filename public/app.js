@@ -230,46 +230,139 @@ async function player(username) {
   };
 }
 
+const CATS = ['hangout', 'game', 'obby', 'art', 'showcase', 'roleplay', 'puzzle', 'other'];
+const cap = w => w ? w[0].toUpperCase() + w.slice(1) : '';
+const thumb = (down = false) => `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="vertical-align:-3px${down ? ';transform:rotate(180deg)' : ''}"><path fill="currentColor" d="M2 21h4V9H2v12zm20-11a2 2 0 0 0-2-2h-6.3l1-4.6v-.3c0-.4-.2-.8-.4-1.1L13.2 1 6.6 7.6C6.2 8 6 8.5 6 9v10a2 2 0 0 0 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7.1c.1-.2.2-.5.2-.7v-2z"/></svg>`;
+const rating = r => { const t = (r.likes || 0) + (r.dislikes || 0); return t ? Math.round(100 * (r.likes || 0) / t) + '% liked' : 'No ratings yet'; };
+
 function roomCards(rooms) {
   return rooms?.length ? `<div class="grid">${rooms.map(r => `<a class="card" style="text-decoration:none" href="#/room/${esc(r.id)}">
     <h3>${esc(r.name)}</h3><p>${esc(r.description) || 'A Maker Pen creation.'}</p>
-    <span class="tag">${r.visits} visits</span>${r.profiles ? ` <span class="tag">by @${esc(r.profiles.username)}</span>` : ''}</a>`).join('')}</div>`
-    : `<div class="card empty">No public rooms yet. Build one in-game with the Maker Pen and tap Publish.</div>`;
+    <div class="row" style="gap:6px">${r.settings?.category ? `<span class="tag">${esc(cap(r.settings.category))}</span>` : ''}
+    <span class="tag">${fmt(r.visits)} visits</span><span class="tag" style="color:#3ddc84">${thumb()} ${fmt(r.likes)}</span>
+    <span class="tag" style="color:#ff7a8a">${thumb(true)} ${fmt(r.dislikes)}</span>${r.profiles ? ` <span class="tag">by @${esc(r.profiles.username)}</span>` : ''}
+    ${r.is_public === false ? '<span class="tag">Private</span>' : ''}</div></a>`).join('')}</div>`
+    : `<div class="card empty">No rooms here yet. Build one in-game with the Maker Pen and tap Publish.</div>`;
 }
 
 async function rooms() {
-  app.innerHTML = `<h1>Player rooms</h1><div class="tabs"><button class="btn small" data-s="popular">Popular</button>
-    <button class="btn small ghost" data-s="new">New</button>${me() ? `<button class="btn small ghost" data-s="mine">Mine</button>` : ''}</div><div id="list"></div>`;
-  const load = async s => {
-    const q = s === 'mine' ? '?scope=mine&limit=60' : `?sort=${s}&limit=60`;
+  app.innerHTML = `<h1>Player rooms</h1><div class="tabs" style="flex-wrap:wrap"><button class="btn small" data-s="popular">Popular</button>
+    <button class="btn small ghost" data-s="liked">Top rated</button><button class="btn small ghost" data-s="new">New</button>
+    ${me() ? `<button class="btn small ghost" data-s="mine">Mine</button>` : ''}</div>
+    <div class="row" style="margin-bottom:16px;max-width:320px"><select id="cat"><option value="">All categories</option>
+    ${CATS.map(c => `<option value="${c}">${cap(c)}</option>`).join('')}</select></div><div id="list"></div>`;
+  let sort = 'popular';
+  const load = async () => {
+    const cat = document.getElementById('cat').value;
+    const q = sort === 'mine' ? '?scope=mine&limit=60' : `?sort=${sort}&limit=60${cat ? '&category=' + cat : ''}`;
+    document.getElementById('list').innerHTML = '<div class="card empty">Loading...</div>';
     try { document.getElementById('list').innerHTML = roomCards(await api('GET', '/api/rooms' + q)); }
     catch (x) { document.getElementById('list').innerHTML = `<div class="card empty">${esc(x.message)}</div>`; }
   };
-  app.querySelector('.tabs').onclick = e => { const s = e.target.dataset.s; if (!s) return;
-    [...e.currentTarget.children].forEach(b => b.classList.toggle('ghost', b !== e.target)); load(s); };
-  load('popular');
+  app.querySelector('.tabs').onclick = e => { const s = e.target.closest('button')?.dataset.s; if (!s) return;
+    [...e.currentTarget.children].forEach(b => b.classList.toggle('ghost', b.dataset.s !== s)); sort = s; load(); };
+  document.getElementById('cat').onchange = load;
+  load();
 }
+
+const SETTING_ROWS = [
+  ['category', 'Category', [['', 'None'], ...CATS.map(c => [c, cap(c)])]],
+  ['gravity', 'Gravity', [[0.3, 'Moon'], [0.6, 'Low'], [1, 'Normal'], [1.6, 'High'], [2.5, 'Heavy']]],
+  ['speed', 'Walk speed', [[0.6, 'Slow'], [1, 'Normal'], [1.5, 'Fast'], [2.2, 'Super fast']]],
+  ['jump', 'Jump power', [[0, 'No jumping'], [0.6, 'Low'], [1, 'Normal'], [1.6, 'High'], [2.5, 'Super']]],
+  ['respawn_y', 'Respawn if below', [[-5, '5 m'], [-15, '15 m'], [-30, '30 m'], [-60, '60 m'], [-150, '150 m']]],
+  ['max_players', 'Player limit', [[4, '4'], [8, '8'], [12, '12'], [16, '16'], [20, '20']]],
+  ['chat', 'Chat', [[true, 'On'], [false, 'Off']]],
+  ['sky', 'Sky', [['', 'Normal'], ['#FF8A5B', 'Sunset'], ['#1B1F4A', 'Night'], ['#FF8FD1', 'Pink'], ['#7CF5C4', 'Mint'], ['#3A8DFF', 'Ocean'],
+    ['#FFD84D', 'Gold'], ['#8B5CF6', 'Purple'], ['#3A5A2A', 'Spooky'], ['#E0381F', 'Fire']]]
+];
+const DEFAULTS = { build: 'everyone', category: '', gravity: 1, speed: 1, jump: 1, respawn_y: -30, max_players: 12, chat: true, sky: '' };
+const nearest = (opts, v) => opts.reduce((b, o) => (typeof o[0] === 'number' && Math.abs(o[0] - v) < Math.abs(b[0] - v) ? o : b), opts[0])[0];
 
 async function room(id) {
   let r;
   try { r = await api('GET', '/api/rooms/' + encodeURIComponent(id)); }
   catch (x) { app.innerHTML = `<div class="card empty">${esc(x.message)}</div>`; return; }
-  const mine = me()?.id === r.owner_id, blocks = r.data?.blocks?.length || 0;
+  const mine = me()?.id === r.owner_id, blocks = r.data?.blocks?.length || 0, chips = r.data?.chips?.length || 0;
+  const st = { ...DEFAULTS, ...(r.settings || {}) };
+  const pick = (key, opts) => { const v = st[key]; return typeof opts[0][0] === 'number' ? nearest(opts, Number(v)) : v; };
+  const settingsHtml = SETTING_ROWS.map(([key, label, opts]) => `<div class="row" style="margin:6px 0"><b style="min-width:150px">${label}</b>
+    ${opts.map(([v, n]) => `<button class="btn small ${String(pick(key, opts)) === String(v) ? '' : 'ghost'}" ${mine ? '' : 'disabled'}
+      data-key="${key}" data-val='${JSON.stringify(v)}'>${n}</button>`).join('')}</div>`).join('');
+  const link = location.origin + location.pathname + '#/room/' + r.id;
   app.innerHTML = `<div class="card"><h1>${esc(r.name)}</h1><p>${esc(r.description) || 'A Maker Pen creation.'}</p>
     <div class="row"><span class="tag">by <a href="#/u/${esc(r.profiles?.username)}">@${esc(r.profiles?.username)}</a></span>
-    <span class="tag">${blocks} pieces</span><span class="tag">${r.visits} visits</span><span class="tag">${r.is_public ? 'Public' : 'Private'}</span></div>
-    <p class="hint">Open the game, press Tab, go to <b>Create</b> or <b>Play &rsaquo; Maker Rooms</b> and pick <b>${esc(r.name)}</b> to visit.</p>
-    ${mine ? `<div class="row"><button class="btn small purple" id="pub">${r.is_public ? 'Make private' : 'Make public'}</button>
-      <button class="btn small danger" id="del">Delete room</button></div>` : ''}</div>`;
-  if (mine) {
-    document.getElementById('pub').onclick = async () => {
-      try { await api('PATCH', '/api/rooms/' + r.id, { is_public: !r.is_public }); room(id); } catch (x) { toast(x.message); }
-    };
-    document.getElementById('del').onclick = async () => {
-      if (!confirm('Delete this room forever?')) return;
-      try { await api('DELETE', '/api/rooms/' + r.id); location.hash = '#/rooms'; } catch (x) { toast(x.message); }
-    };
-  }
+    ${st.category ? `<span class="tag">${esc(cap(st.category))}</span>` : ''}
+    <span class="tag">${blocks} pieces</span><span class="tag">${chips} CV3 chips</span><span class="tag">${fmt(r.visits)} visits</span>
+    <span class="tag">${r.is_public ? 'Public' : 'Private'}</span><span class="tag">Up to ${st.max_players} players</span></div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn small ${r.my_vote === 1 ? '' : 'ghost'}" id="like" ${mine ? 'disabled title="You can\'t rate your own room"' : ''} style="${r.my_vote === 1 ? 'background:#3ddc84' : ''}">${thumb()} Like · ${fmt(r.likes)}</button>
+      <button class="btn small ${r.my_vote === -1 ? 'danger' : 'ghost'}" id="dislike" ${mine ? 'disabled' : ''}>${thumb(true)} Dislike · ${fmt(r.dislikes)}</button>
+      <span class="hint" style="margin:0">${rating(r)}</span>
+      <button class="btn small ghost" id="share">Copy link</button></div>
+    <p class="hint">Open the game, press Tab, go to <b>Create</b> or <b>Play &rsaquo; Maker Rooms</b> and pick <b>${esc(r.name)}</b> to visit.</p></div>
+    ${mine ? `<div class="card" style="margin-top:16px"><h2>Manage room</h2>
+      <label class="hint">Name</label><input id="rname" maxlength="40" value="${esc(r.name)}">
+      <label class="hint">Description</label><textarea id="rdesc" maxlength="280" rows="3">${esc(r.description)}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn small" id="savedet">Save name &amp; description</button>
+      <button class="btn small purple" id="pub">${r.is_public ? 'Make private' : 'Make public'}</button>
+      <button class="btn small ghost" id="copy">Save a copy</button>
+      <button class="btn small danger" id="del">Delete room</button></div>
+      <h3 style="margin-top:22px">Co-owners</h3>
+      <p class="hint">Only you and your co-owners can use the Maker Pen in this room. Co-owners can also open it while it's private.</p>
+      <div class="row" style="gap:8px;margin:8px 0">${(r.co_owners || []).length ? r.co_owners.map(c => `<span class="tag">@${esc(c.username)}
+        <button class="btn small ghost" style="padding:0 8px;margin-left:6px" data-rm="${esc(c.id)}" title="Remove">&times;</button></span>`).join('') : '<span class="hint" style="margin:0">No co-owners yet.</span>'}</div>
+      <div class="row" style="max-width:520px"><input id="coname" maxlength="21" placeholder="Username to add" style="flex:1">
+      <button class="btn small purple" id="coadd">Add co-owner</button></div></div>` : ''}
+    ${!mine && r.is_coowner ? `<div class="card" style="margin-top:16px"><h2>You're a co-owner</h2>
+      <p class="hint">You can build in this room with the Maker Pen.</p><button class="btn small ghost" id="leave">Stop being a co-owner</button></div>` : ''}
+    <div class="card" style="margin-top:16px"><h2>Room settings</h2>
+      <p class="hint">${mine ? 'Changes save right away and apply the next time the room loads (or instantly from the in-game Room tab).' : 'Set by the room creator.'}</p>
+      ${settingsHtml}</div>`;
+
+  const vote = async v => {
+    if (!me()) { toast('Log in to rate rooms.'); return; }
+    try { await api('POST', `/api/rooms/${r.id}/vote`, { vote: r.my_vote === v ? 0 : v }); room(id); } catch (x) { toast(x.message); }
+  };
+  document.getElementById('like').onclick = () => vote(1);
+  document.getElementById('dislike').onclick = () => vote(-1);
+  document.getElementById('share').onclick = async () => {
+    try { await navigator.clipboard.writeText(link); toast('Link copied!'); } catch { prompt('Copy this link:', link); }
+  };
+  if (!mine && r.is_coowner) document.getElementById('leave').onclick = async () => {
+    if (!confirm('Stop being a co-owner of this room?')) return;
+    try { await api('DELETE', `/api/rooms/${r.id}/coowners/${me().id}`); room(id); } catch (x) { toast(x.message); }
+  };
+  if (!mine) return;
+  const addCo = async () => {
+    const n = document.getElementById('coname').value.trim();
+    if (!n) return;
+    try { const c = await api('POST', `/api/rooms/${r.id}/coowners`, { username: n }); toast('@' + c.username + ' is now a co-owner.'); room(id); } catch (x) { toast(x.message); }
+  };
+  document.getElementById('coadd').onclick = addCo;
+  document.getElementById('coname').onkeydown = e => { if (e.key === 'Enter') addCo(); };
+  app.querySelectorAll('[data-rm]').forEach(b => b.onclick = async e => {
+    e.preventDefault();
+    try { await api('DELETE', `/api/rooms/${r.id}/coowners/${b.dataset.rm}`); toast('Co-owner removed.'); room(id); } catch (x) { toast(x.message); }
+  });
+  app.querySelectorAll('[data-key]').forEach(b => b.onclick = async () => {
+    const next = { ...st, [b.dataset.key]: JSON.parse(b.dataset.val) };
+    try { await api('PATCH', '/api/rooms/' + r.id, { settings: next }); room(id); } catch (x) { toast(x.message); }
+  });
+  document.getElementById('savedet').onclick = async () => {
+    try { await api('PATCH', '/api/rooms/' + r.id, { name: document.getElementById('rname').value, description: document.getElementById('rdesc').value }); toast('Saved!'); room(id); }
+    catch (x) { toast(x.message); }
+  };
+  document.getElementById('pub').onclick = async () => {
+    try { await api('PATCH', '/api/rooms/' + r.id, { is_public: !r.is_public }); toast(r.is_public ? 'Room is private now.' : 'Room is public!'); room(id); } catch (x) { toast(x.message); }
+  };
+  document.getElementById('copy').onclick = async () => {
+    try { const c = await api('POST', `/api/rooms/${r.id}/copy`, {}); toast('Copy saved (private).'); location.hash = '#/room/' + c.id; } catch (x) { toast(x.message); }
+  };
+  document.getElementById('del').onclick = async () => {
+    if (!confirm('Delete this room forever? This can\'t be undone.')) return;
+    try { await api('DELETE', '/api/rooms/' + r.id); location.hash = '#/rooms'; } catch (x) { toast(x.message); }
+  };
 }
 
 // ---------- tokens ----------

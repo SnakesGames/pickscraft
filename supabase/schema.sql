@@ -383,6 +383,115 @@ begin
      order by g.created_at desc limit least(greatest(p_limit, 1), 200);
 end $$;
 
+-- ============ ROOM LIKES / DISLIKES + ROOM SETTINGS ============
+-- likes / dislikes are kept on the room (fast to list and sort); players can't edit them directly.
+alter table public.rooms add column if not exists likes int not null default 0;
+alter table public.rooms add column if not exists dislikes int not null default 0;
+-- Room settings the game applies: who can build, category, gravity / speed / jump, sky colour.
+alter table public.rooms add column if not exists settings jsonb not null default '{}'::jsonb;
+do $$ begin
+  alter table public.rooms add constraint rooms_settings_size check (octet_length(settings::text) < 4000);
+exception when duplicate_object then null; end $$;
+create index if not exists rooms_public_likes on public.rooms (likes desc) where is_public;
+revoke update on public.rooms from anon, authenticated;
+grant update (name, description, data, is_public, settings, updated_at) on public.rooms to authenticated;
+
+create table if not exists public.room_votes (
+  room_id  uuid not null references public.rooms(id) on delete cascade,
+  user_id  uuid not null references public.profiles(id) on delete cascade,
+  vote     smallint not null check (vote in (-1, 1)),
+  voted_at timestamptz not null default now(),
+  primary key (room_id, user_id)
+);
+alter table public.room_votes enable row level security;
+drop policy if exists "see own votes" on public.room_votes;
+create policy "see own votes" on public.room_votes for select using (user_id = auth.uid());
+revoke insert, update, delete on public.room_votes from anon, authenticated;
+grant select on public.room_votes to authenticated;
+
+-- Like (1), dislike (-1) or clear (0) a room. You can't rate your own room or a private one.
+create or replace function public.vote_room(p_room uuid, p_vote int) returns json
+language plpgsql security definer set search_path = public as $$
+declare me uuid := auth.uid(); v_owner uuid; v_public boolean; v_l int; v_d int;
+begin
+  if me is null then raise exception 'Log in to rate rooms.'; end if;
+  select r.owner_id, r.is_public into v_owner, v_public from public.rooms r where r.id = p_room;
+  if v_owner is null or (not v_public and v_owner <> me) then raise exception 'Room not found.'; end if;
+  if v_owner = me then raise exception 'You can''t rate your own room.'; end if;
+  if p_vote = 0 then
+    delete from public.room_votes rv where rv.room_id = p_room and rv.user_id = me;
+  elsif p_vote in (-1, 1) then
+    insert into public.room_votes as rv (room_id, user_id, vote) values (p_room, me, p_vote)
+      on conflict (room_id, user_id) do update set vote = excluded.vote, voted_at = now();
+  else
+    raise exception 'Vote must be 1, -1 or 0.';
+  end if;
+  select count(*) filter (where rv.vote = 1), count(*) filter (where rv.vote = -1) into v_l, v_d
+    from public.room_votes rv where rv.room_id = p_room;
+  update public.rooms r set likes = v_l, dislikes = v_d where r.id = p_room;
+  return json_build_object('likes', v_l, 'dislikes', v_d,
+    'my_vote', coalesce((select rv.vote from public.room_votes rv where rv.room_id = p_room and rv.user_id = me), 0));
+end $$;
+
+revoke execute on function public.vote_room(uuid, int) from public, anon;
+grant execute on function public.vote_room(uuid, int) to authenticated;
+
+-- ============ ROOM CO-OWNERS ============
+-- Only a room's creator and its co-owners can use the Maker Pen in it. The creator adds / removes co-owners.
+create table if not exists public.room_coowners (
+  room_id  uuid not null references public.rooms(id) on delete cascade,
+  user_id  uuid not null references public.profiles(id) on delete cascade,
+  added_at timestamptz not null default now(),
+  primary key (room_id, user_id)
+);
+alter table public.room_coowners enable row level security;
+
+-- helpers (security definer, so the rooms <-> co-owners policies don't loop into each other)
+create or replace function public.room_owner_of(p_room uuid) returns uuid
+language sql stable security definer set search_path = public as $$ select r.owner_id from public.rooms r where r.id = p_room $$;
+create or replace function public.is_room_coowner(p_room uuid, p_user uuid) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.room_coowners c where c.room_id = p_room and c.user_id = p_user) $$;
+
+drop policy if exists "owners and coowners see coowners" on public.room_coowners;
+create policy "owners and coowners see coowners" on public.room_coowners for select
+  using (user_id = auth.uid() or public.room_owner_of(room_id) = auth.uid());
+revoke insert, update, delete on public.room_coowners from anon, authenticated;
+grant select on public.room_coowners to authenticated;
+
+-- co-owners can open the room even while it's private
+drop policy if exists "public or own rooms" on public.rooms;
+create policy "public or own rooms" on public.rooms for select
+  using (is_public or owner_id = auth.uid() or public.is_room_coowner(id, auth.uid()));
+
+create or replace function public.add_room_coowner(p_room uuid, p_username text) returns json
+language plpgsql security definer set search_path = public as $$
+declare v_user uuid; v_name text;
+begin
+  if public.room_owner_of(p_room) is distinct from auth.uid() then raise exception 'Only the room''s creator can add co-owners.'; end if;
+  select pr.id, pr.username into v_user, v_name from public.profiles pr where lower(pr.username) = lower(trim(p_username));
+  if v_user is null then raise exception 'No player called %.', p_username; end if;
+  if v_user = auth.uid() then raise exception 'You already own this room.'; end if;
+  if (select count(*) from public.room_coowners c where c.room_id = p_room) >= 20 then raise exception 'Rooms can have at most 20 co-owners.'; end if;
+  insert into public.room_coowners (room_id, user_id) values (p_room, v_user) on conflict do nothing;
+  return json_build_object('id', v_user, 'username', v_name);
+end $$;
+
+create or replace function public.remove_room_coowner(p_room uuid, p_user uuid) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  -- the creator can remove anyone; a co-owner can remove themselves
+  if public.room_owner_of(p_room) is distinct from auth.uid() and p_user is distinct from auth.uid() then
+    raise exception 'Only the room''s creator can remove co-owners.';
+  end if;
+  delete from public.room_coowners c where c.room_id = p_room and c.user_id = p_user;
+end $$;
+
+revoke execute on function public.room_owner_of(uuid), public.is_room_coowner(uuid, uuid),
+  public.add_room_coowner(uuid, text), public.remove_room_coowner(uuid, uuid) from public, anon;
+grant execute on function public.room_owner_of(uuid), public.is_room_coowner(uuid, uuid) to anon, authenticated;
+grant execute on function public.add_room_coowner(uuid, text), public.remove_room_coowner(uuid, uuid) to authenticated;
+
 -- ============ FUNCTION PERMISSIONS ============
 revoke execute on all functions in schema public from public, anon;
 grant execute on function public.handle_new_user() to supabase_auth_admin;
@@ -391,4 +500,7 @@ grant execute on function public.award_game_xp(int), public.are_friends(uuid, uu
   public.respond_friend_request(bigint, boolean), public.remove_friend(uuid), public.heartbeat(text, text, text, text),
   public.go_offline(), public.get_friends(), public.get_friend_requests(),
   public.creator_stats(), public.creator_daily(int, uuid), public.creator_totals(),
-  public.admin_give_tokens(text, int, text), public.my_gifts(), public.open_gift(bigint), public.admin_gift_log(int) to authenticated;
+  public.admin_give_tokens(text, int, text), public.my_gifts(), public.open_gift(bigint), public.admin_gift_log(int),
+  public.vote_room(uuid, int) to authenticated;
+grant execute on function public.room_owner_of(uuid), public.is_room_coowner(uuid, uuid) to anon, authenticated;
+grant execute on function public.add_room_coowner(uuid, text), public.remove_room_coowner(uuid, uuid) to authenticated;
