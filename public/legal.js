@@ -7,12 +7,12 @@
 
 export const LEGAL = {
   version: '1.0',
-  updated: 'October 19, 2026',
+  updated: 'October 20, 2026',
   name: 'Pickscraft Network',
   site: 'www.pickscraft.net',
   // Fill these in before you publish:
-  contact: '',          // e.g. 'support@pickscraft.net' - where people send privacy requests and questions
-  law: '',              // e.g. 'the State of New York, USA' - whose laws govern the Terms
+  contact: 'support@pickscraft.net',          // e.g. 'support@pickscraft.net' - where people send privacy requests and questions
+  law: 'the State of New York, USA',              // e.g. 'the State of New York, USA' - whose laws govern the Terms
   minAge: 13
 };
 
