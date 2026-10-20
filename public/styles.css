@@ -112,3 +112,15 @@ h1 .ticon { width: 34px; height: 34px; vertical-align: -5px; }
   .topbar { padding: 10px 16px; }
   main { padding: 20px 16px 40px; }
 }
+
+/* legal pages + sign-up agreement */
+.legal { max-width: 860px; margin: 0 auto; line-height: 1.65; }
+.legal h1 { margin-bottom: 4px; }
+.legal h2 { font-size: 21px; margin: 26px 0 8px; }
+.legal p, .legal li { color: var(--text); }
+.legal ul { padding-left: 22px; }
+.legal li { margin: 4px 0; }
+.legal mark { background: #ffd84d; color: #1b1020; border-radius: 4px; padding: 0 4px; }
+.footer a { color: var(--muted); }
+label.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 14px; color: var(--muted); margin: 12px 0 4px; line-height: 1.45; }
+label.check input { width: auto; margin-top: 3px; flex: none; }

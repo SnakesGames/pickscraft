@@ -1,6 +1,8 @@
 // Pickscraft Network website. Everything goes through this site's own /api (lib/api.js) -
 // the same API the Unity game uses - so no database keys are needed in the browser.
 
+import { LEGAL, privacyHtml, termsHtml } from './legal.js';
+
 const cfg = window.PICKSCRAFT_CONFIG || {};
 const API = (cfg.apiBase || '').replace(/\/+$/, '');
 const app = document.getElementById('app');
@@ -103,7 +105,9 @@ function authPage(mode) {
     <div class="hint">3&ndash;20 letters, numbers or _. This is how friends find you.</div>` : ''}
     <label for="em">Email</label><input id="em" type="email" autocomplete="email" maxlength="254" required>
     <label for="p">Password</label><input id="p" type="password" autocomplete="${signup ? 'new' : 'current'}-password" minlength="6" required>
-    ${signup ? `<label for="p2">Confirm password</label><input id="p2" type="password" autocomplete="new-password" required>` : ''}
+    ${signup ? `<label for="p2">Confirm password</label><input id="p2" type="password" autocomplete="new-password" required>
+    <label class="check"><input type="checkbox" id="agree" required><span>I'm ${LEGAL.minAge} or older (or have my parent's permission if I'm under 18),
+      and I agree to the <a href="#/terms" target="_blank">Terms of Service</a> and <a href="#/privacy" target="_blank">Privacy Policy</a>.</span></label>` : ''}
     <div class="error" id="err"></div>
     <button class="btn" style="width:100%">${signup ? 'Sign up' : 'Log in'}</button>
     <p class="hint" style="text-align:center">${signup ? 'Already have an account? <a href="#/login">Log in</a>' : 'New here? <a href="#/signup">Make an account</a>'}</p>
@@ -119,15 +123,21 @@ function authPage(mode) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return err.textContent = 'Please enter a real email address.';
     if (password.length < 6) return err.textContent = 'Passwords need at least 6 characters.';
     if (signup && password !== document.getElementById('p2').value) return err.textContent = 'Passwords do not match.';
+    if (signup && !document.getElementById('agree').checked) return err.textContent = 'Please agree to the Terms of Service and Privacy Policy.';
     btn.disabled = true;
     try {
-      const r = await raw('POST', signup ? '/api/auth/signup' : '/api/auth/login', signup ? { username, email, password } : { email, password }, false);
+      const r = await raw('POST', signup ? '/api/auth/signup' : '/api/auth/login', signup ? { username, email, password, accept_terms: LEGAL.version } : { email, password }, false);
       if (r.confirm) { app.innerHTML = `<div class="card empty"><h2>Check your email</h2><p>${esc(r.message)}</p><p><a class="btn" href="#/login">Go to log in</a></p></div>`; return; }
       saveSession(r);
       if (signup) { toast('Welcome to Pickscraft Network!'); location.hash = '#/me'; }
       else location.hash = '#/friends';
     } catch (x) { err.textContent = x.message; } finally { btn.disabled = false; }
   };
+}
+
+function legalPage(html) {
+  app.innerHTML = `<article class="card legal">${html}</article>`;
+  scrollTo(0, 0);
 }
 
 async function profileEdit() {
@@ -514,7 +524,8 @@ async function route() {
   const [, page, arg] = (location.hash || '#/').split('/');
   document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#/${page}`));
   const pages = { '': home, login: () => authPage('login'), signup: () => authPage('signup'), me: profileEdit, friends,
-    rooms, u: () => player(decodeURIComponent(arg || '')), room: () => room(arg), creator, admin };
+    rooms, u: () => player(decodeURIComponent(arg || '')), room: () => room(arg), creator, admin,
+    privacy: () => legalPage(privacyHtml()), terms: () => legalPage(termsHtml()) };
   try { await (pages[page] || home)(); } catch (e) { console.error(e); app.innerHTML = `<div class="card empty">Something went wrong: ${esc(e.message)}</div>`; }
   document.getElementById('setup-banner').hidden = serverReady;
 }
