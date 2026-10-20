@@ -27,6 +27,8 @@ nav a:hover, nav a.active { color: var(--text); }
 .btn:disabled { opacity: .5; cursor: default; }
 main { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding: 32px 20px 60px; }
 .banner { background: #4a2a10; color: #ffd8b8; text-align: center; padding: 10px 16px; }
+.banner.announce { background: #2b2350; color: #e8e2ff; }
+.banner .x { background: none; border: 0; color: inherit; font-size: 1.2em; cursor: pointer; margin-left: 8px; }
 .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; padding: 30px 0 50px; }
 .hero h1 { font-size: clamp(38px, 6vw, 64px); }
 .hero h1 span { color: var(--accent); }

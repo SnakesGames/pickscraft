@@ -7,7 +7,7 @@
 
 export const LEGAL = {
   version: '1.0',
-  updated: 'October 19, 2026',
+  updated: 'October 20, 2026',
   name: 'Pickscraft Network',
   site: 'www.pickscraft.net',
   // Fill these in before you publish:
@@ -52,7 +52,8 @@ If anything is unclear, contact us at ${c}.</p>
 
 <h2>2. Information collected when you play</h2>
 <ul>
-  <li><b>Game progress:</b> your level, XP, and Tokens (our in-game currency), and gifts of Tokens sent to you.</li>
+  <li><b>Game progress:</b> your level, XP, and Tokens (our in-game currency), gifts of Tokens sent to you, and the avatar items you've bought or been given.</li>
+  <li><b>Your avatar:</b> the outfit and colours you pick, saved to your account so they follow you to other devices. Other players see your avatar in the game.</li>
   <li><b>Online status:</b> while you're signed in, the game tells our server every so often that you're online, which room you're in,
     whether that room is private, and whether you're playing on desktop, VR or mobile. This is replaced each time and is used for your friends list.</li>
   <li><b>Room visits:</b> when you visit someone's Maker room we record that a visit happened and when, so the room's creator can see visit
@@ -94,7 +95,8 @@ If anything is unclear, contact us at ${c}.</p>
   <li><b>Your friends:</b> whether you're online, which room you're in and which platform you're playing on. If you're in a private room,
     friends can see its name but can't join without an invite.</li>
   <li><b>Room creators:</b> visit totals for their rooms (not who visited), and the co-owners they've added.</li>
-  <li><b>Admins:</b> the people who run ${LEGAL.name} can see account information when needed to run the Service, handle reports, and send Tokens.</li>
+  <li><b>Admins:</b> the people who run ${LEGAL.name} can see account information when needed to run the Service, handle reports, send Tokens or items, and mute or ban accounts.
+    Admin actions (who did what, to which account, and why) are recorded in an admin log that only admins can see.</li>
   <li>Your email address is never shown to other players.</li>
 </ul>
 
@@ -116,6 +118,7 @@ to protect the safety of players or the public, or as part of a sale or transfer
   <li>Online status: replaced every time the game updates it, and counted as offline after about 90 seconds.</li>
   <li>Room invites: deleted within about a day.</li>
   <li>Room visit records: kept so creators can see their history; deleted if the room is deleted.</li>
+  <li>Announcements: shown for about a day. The admin log and ban or mute records: kept while needed to keep the Service safe.</li>
   <li>Hosting and provider logs: kept for a short time under each provider's own policy.</li>
 </ul>
 
@@ -202,7 +205,8 @@ ${LEGAL.site} (the "Service"). By creating an account or using the Service you a
 <h2>5. Tokens, XP and other virtual items</h2>
 <ul>
   <li>Tokens, XP, levels and other in-game items have <b>no real-world money value</b>. They can't be sold, traded for money, or cashed out.</li>
-  <li>Tokens can't currently be bought. Admins may give Tokens as gifts or rewards, and may remove Tokens that were gained by cheating or by mistake.</li>
+  <li>Tokens can't currently be bought with real money. You earn them by playing, and admins may give Tokens as gifts or rewards, and may remove Tokens that were gained by cheating or by mistake.</li>
+  <li>You can spend Tokens on avatar items in the in-game shop. Purchases are final: spent Tokens aren't given back, except where we choose to or the law requires it. Items you buy stay on your account, but we may remove items that were gained by cheating, by mistake, or through a bug.</li>
   <li>We may change, rebalance or remove virtual items. You have a licence to use them in the Service; you don't own them.</li>
 </ul>
 
@@ -222,7 +226,7 @@ We aren't responsible for their services or outages.</p>
 <h2>9. Ending your use of the Service</h2>
 <ul>
   <li>You can stop using the Service at any time, and ask us to delete your account at ${c}.</li>
-  <li>We may warn, mute, suspend or ban accounts, remove content, or reset progress if you break these Terms or put other players or the Service at risk.
+  <li>We may warn, mute (block chat), suspend or ban accounts (for a set time or for good), remove content, or reset progress if you break these Terms or put other players or the Service at risk.
     Where it's reasonable, we'll tell you why.</li>
   <li>We may change or stop the Service (or any part of it) at any time.</li>
 </ul>

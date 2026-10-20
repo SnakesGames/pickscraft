@@ -479,7 +479,7 @@ async function creator() {
   clearTimeout(creator.r); onresize = () => { clearTimeout(creator.r); creator.r = setTimeout(() => location.hash === '#/creator' && draw(), 150); };
 }
 
-// ---------- admin: give Tokens ----------
+// ---------- admin: Tokens, bans, mutes, items, announcements ----------
 async function admin() {
   if (!need()) return;
   if (!myProfile) await loadMyProfile();
@@ -488,14 +488,33 @@ async function admin() {
       <code>update public.profiles set is_admin = true where username = '${esc(me()?.username || 'YourUsername')}';</code></div>`;
     return;
   }
-  app.innerHTML = `<h1>${tokenIcon()} Give Tokens</h1><div class="two">
+  app.innerHTML = `<h1>${tokenIcon()} Admin</h1><h2>Give Tokens</h2><div class="two">
     <form class="card" id="give"><h3>Send a gift box</h3>
       <label for="gu">Player</label><input id="gu" maxlength="20" placeholder="username, or * for everyone" required>
       <label for="ga">Amount</label><input id="ga" type="number" step="1" min="-1000000" max="1000000" value="100" required>
       <label for="gm">Message (shown when they open the box)</label><input id="gm" maxlength="120" placeholder="Thanks for playing!">
       <div class="hint">Tokens go into their balance right away. If they're in the game, a gift box drops in front of them to open; otherwise it waits for their next visit. A negative amount takes Tokens away (no box).</div>
       <div class="error" id="err"></div><button class="btn">Send Tokens</button></form>
-    <div class="card"><h3>Recent gifts</h3><div id="log"><div class="empty">Loading&hellip;</div></div></div></div>`;
+    <div class="card"><h3>Recent gifts</h3><div id="log"><div class="empty">Loading&hellip;</div></div></div></div>
+    <h2>Player tools</h2><div class="two">
+    <form class="card" id="act"><h3>Moderate a player</h3>
+      <label for="au">Player</label><input id="au" maxlength="21" placeholder="username" required>
+      <label for="ac">Action</label><select id="ac">
+        <option value="lookup">Look up (info only)</option><option value="ban">Ban</option><option value="unban">Unban</option>
+        <option value="mute">Mute chat</option><option value="unmute">Unmute</option>
+        <option value="grant">Give an avatar item</option><option value="take">Take an avatar item</option>
+        <option value="admin">Make admin</option><option value="unadmin">Remove admin</option></select>
+      <div data-f="minutes"><label for="am">How long (minutes, 0 = forever)</label><input id="am" type="number" min="0" step="1" value="60"></div>
+      <div data-f="reason"><label for="ar">Reason (the player sees it)</label><input id="ar" maxlength="200" placeholder="Breaking the rules"></div>
+      <div data-f="key"><label for="ak">Item</label><select id="ak"></select></div>
+      <div class="hint" id="ahint"></div>
+      <div class="error" id="aerr"></div><button class="btn">Do it</button>
+      <div id="aout"></div></form>
+    <form class="card" id="ann"><h3>Announcement</h3>
+      <label for="amsg">Message</label><input id="amsg" maxlength="200" placeholder="Server restart in 5 minutes!" required>
+      <div class="hint">Shows as a banner for everyone who's in the game right now (and on the website for a day).</div>
+      <div class="error" id="nerr"></div><button class="btn">Announce</button>
+      <h3 style="margin-top:1.5em">Admin log</h3><div id="alog"><div class="empty">Loading&hellip;</div></div></form></div>`;
   const log = async () => {
     try {
       const rows = await api('GET', '/api/admin/gifts?limit=40');
@@ -516,6 +535,52 @@ async function admin() {
     } catch (x) { err.textContent = x.message; } finally { btn.disabled = false; }
   };
   log();
+
+  // ---- player tools
+  const $ = id => document.getElementById(id);
+  const show = () => {
+    const c = $('ac').value;
+    document.querySelectorAll('#act [data-f]').forEach(d => d.hidden = !({ minutes: ['ban', 'mute'], reason: ['ban'], key: ['grant', 'take'] }[d.dataset.f] || []).includes(c));
+    $('ahint').textContent = { ban: 'Banned players can\'t log in or use the game until the ban ends.', mute: 'Muted players can\'t send chat messages in the game.',
+      grant: 'Type * as the player to give the item to everyone.', admin: 'Admins can use every admin command in the game and here.' }[c] || '';
+  };
+  $('ac').onchange = show; show();
+  api('GET', '/api/shop').then(items => { $('ak').innerHTML = items.map(i => `<option value="${esc(i.key)}">${esc(i.name)} (${esc(i.slot)}${i.price ? ', ' + fmt(i.price) : ', free'})</option>`).join(''); }).catch(() => {});
+  const alog = async () => {
+    try {
+      const rows = await api('GET', '/api/admin/log?limit=30');
+      $('alog').innerHTML = rows.length ? `<table class="tbl"><thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Player</th><th>Details</th></tr></thead><tbody>${rows.map(r =>
+        `<tr><td>${ago(r.created_at)}</td><td>@${esc(r.admin)}</td><td>${esc(r.action)}</td><td>${esc(r.target)}</td><td>${esc(r.detail)}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">Nothing yet.</div>';
+    } catch (x) { $('alog').innerHTML = `<div class="empty">${esc(x.message)}</div>`; }
+  };
+  const when = t => !t ? 'no' : (String(t).startsWith('infinity') || new Date(t).getUTCFullYear() > 9000 ? 'forever' : (new Date(t) > new Date() ? 'until ' + new Date(t).toLocaleString() : 'no'));
+  $('act').onsubmit = async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button'); let cmd = $('ac').value; const username = $('au').value.trim();
+    if (username === '*' && cmd !== 'grant') { $('aerr').textContent = 'Only items can be given to everyone (*).'; return; }
+    if (username === '*' && !confirm('Give this item to EVERY player?')) return;
+    const body = { cmd, username, minutes: +$('am').value || 0, reason: $('ar').value, key: $('ak').value };
+    if (cmd === 'unadmin') { body.cmd = 'admin'; body.on = false; }
+    btn.disabled = true; $('aerr').textContent = ''; $('aout').innerHTML = '';
+    try {
+      const r = await api('POST', '/api/admin/command', body);
+      if (cmd === 'lookup') {
+        $('aout').innerHTML = `<table class="tbl"><tbody>${[['Player', `<a href="#/u/${esc(r.username)}">@${esc(r.username)}</a> (${esc(r.display_name)})`],
+          ['Level', r.level], ['Tokens', fmt(r.tokens)], ['Admin', r.is_admin ? 'yes' : 'no'], ['Joined', new Date(r.created_at).toLocaleDateString()],
+          ['Online', r.online ? 'yes &ndash; ' + esc(r.room_name || '') : (r.last_seen ? 'last seen ' + ago(r.last_seen) : 'never')],
+          ['Banned', when(r.banned_until) + (r.ban_reason ? ' (' + esc(r.ban_reason) + ')' : '')], ['Muted', when(r.muted_until)],
+          ['Rooms', r.rooms], ['Items owned', r.items], ['Friends', r.friends]].map(([a, b]) => `<tr><th>${a}</th><td>${b}</td></tr>`).join('')}</tbody></table>`;
+      } else toast(cmd === 'grant' ? `Gave the item to ${r.given} player${r.given === 1 ? '' : 's'}.` : 'Done!');
+      alog();
+    } catch (x) { $('aerr').textContent = x.message; } finally { btn.disabled = false; }
+  };
+  $('ann').onsubmit = async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button'); btn.disabled = true; $('nerr').textContent = '';
+    try { await api('POST', '/api/admin/command', { cmd: 'announce', message: $('amsg').value }); $('amsg').value = ''; toast('Announced!'); alog(); }
+    catch (x) { $('nerr').textContent = x.message; } finally { btn.disabled = false; }
+  };
+  alog();
 }
 
 // ---------- router ----------
@@ -555,3 +620,12 @@ fetch(API + '/api/health').then(r => r.json()).then(h => { serverReady = !!h.con
 updateNav();
 addEventListener('hashchange', route);
 route();
+// Admin announcements from the last day
+raw('GET', '/api/announcements').then(rows => {
+  const a = rows && rows[0], el = document.getElementById('announce');
+  if (!a || !el) return;
+  let seen = 0; try { seen = +localStorage.getItem('pc_announce_seen') || 0; } catch { /* private mode */ }
+  if (a.id <= seen) return;
+  el.innerHTML = `&#128226; ${esc(a.message)} <button class="x" aria-label="Dismiss">&times;</button>`; el.hidden = false;
+  el.querySelector('button').onclick = () => { el.hidden = true; try { localStorage.setItem('pc_announce_seen', a.id); } catch { /* ignore */ } };
+}).catch(() => {});
