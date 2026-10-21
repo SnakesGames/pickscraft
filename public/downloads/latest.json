@@ -1,12 +1,8 @@
 {
-    "version":  "0.1.0",
-    "url":  "https://github.com/SnakesGames/pickscraft/releases/download/0.1.0/PickscraftNetwork-0.1.0.zip",
-    "sha256":  "70223F9748138574CD27191D970E13F8A9F2A5BD88BF8CE5AC236F64EA2C059B",
-    "size":  48605600,
+    "version":  "0.1.1",
+    "url":  "https://github.com/SnakesGames/pickscraft/releases/download/0.1.1/PickscraftNetwork-0.1.1.zip",
+    "sha256":  "B486A4FE658A6FA164CFA353F9B2AEF925B5DEAF09BA2B13766E8D7420993EE5",
+    "size":  50429578,
     "exe":  "Pickscraft Network.exe",
-    "notes":  "First release: voice chat, badges, avatar shop, player cards and more."
-<<<<<<< Updated upstream
+    "notes":  "3D Text, Leaderboards, the Configure tool, 5,000 new CV3 chips (music, sound, AI, debug), custom cosmetics, and a multiplayer fix."
 }
-=======
-}
->>>>>>> Stashed changes
