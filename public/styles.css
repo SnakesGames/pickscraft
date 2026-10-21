@@ -155,3 +155,9 @@ button.badge-card:hover { border-color: var(--bc); }
 .seg label { display: inline-flex; align-items: center; gap: 6px; background: var(--panel2); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 700; margin: 0; }
 .seg input[type=radio] { width: auto; margin: 0; padding: 0; box-shadow: none; background: none; accent-color: var(--accent); }
 .seg label { white-space: nowrap; }
+
+.team-card { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.team-card:first-of-type { border-top: 0; }
+.team-card .avatar { width: 54px; height: 54px; flex: none; }
+.team-info { flex: 1; min-width: 180px; }
+.team-btns { display: flex; gap: 8px; flex-wrap: wrap; }

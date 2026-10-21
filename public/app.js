@@ -323,6 +323,33 @@ const SETTING_ROWS = [
 const DEFAULTS = { build: 'everyone', category: '', gravity: 1, speed: 1, jump: 1, respawn_y: -30, max_players: 12, chat: true, sky: '' };
 const nearest = (opts, v) => opts.reduce((b, o) => (typeof o[0] === 'number' && Math.abs(o[0] - v) < Math.abs(b[0] - v) ? o : b), opts[0])[0];
 
+// ---------- room team: who made it + co-owners, with Add / View profile ----------
+function teamHtml(team) {
+  if (!team.length) return '';
+  const card = m => `<div class="team-card">${avatar(m)}<div class="team-info"><b>${esc(m.display_name || m.username)}</b>
+      ${m.badge_name ? badgeChip({ name: m.badge_name, color: m.badge_color, icon: m.badge_icon }) : ''}
+      <div class="hint" style="margin:2px 0 0">@${esc(m.username)} &middot; Level ${m.level || 1}</div></div>
+    <div class="team-btns">${me() && me().id !== m.user_id ? `<button class="btn small" data-addf="${esc(m.username)}" data-uid="${esc(m.user_id)}">Add friend</button>` : ''}
+      <a class="btn small ghost" href="#/u/${esc(m.username)}">View profile</a></div></div>`;
+  const creator = team.filter(m => m.role === 'creator'), co = team.filter(m => m.role !== 'creator');
+  return `<div class="card" style="margin-top:16px"><h2>Made by</h2>${creator.map(card).join('')}
+    <h3 style="margin-top:18px">Co-owners <span class="hint">(${co.length})</span></h3>
+    ${co.length ? co.map(card).join('') : '<div class="hint">No co-owners.</div>'}</div>`;
+}
+async function wireTeam(team) {
+  const btns = [...app.querySelectorAll('[data-addf]')];
+  if (!btns.length) return;
+  try {
+    const friends = await api('GET', '/api/friends'), ids = new Set(friends.map(f => f.id));
+    btns.forEach(b => { if (ids.has(b.dataset.uid)) { b.textContent = 'Friends'; b.disabled = true; b.classList.add('ghost'); } });
+  } catch { /* not logged in or offline */ }
+  btns.forEach(b => b.onclick = async () => {
+    try { const { result } = await api('POST', '/api/friends/request', { username: b.dataset.addf }); toast(FRIEND_MSG[result] || 'Could not send');
+      if (result === 'sent' || result === 'accepted') { b.textContent = result === 'accepted' ? 'Friends' : 'Requested'; b.disabled = true; } }
+    catch (x) { toast(x.message); }
+  });
+}
+
 async function room(id) {
   let r;
   try { r = await api('GET', '/api/rooms/' + encodeURIComponent(id)); }
@@ -362,8 +389,10 @@ async function room(id) {
       <p class="hint">You can build in this room with the Maker Pen.</p><button class="btn small ghost" id="leave">Stop being a co-owner</button></div>` : ''}
     <div class="card" style="margin-top:16px"><h2>Room settings</h2>
       <p class="hint">${mine ? 'Changes save right away and apply the next time the room loads (or instantly from the in-game Room tab).' : 'Set by the room creator.'}</p>
-      ${settingsHtml}</div>`;
+      ${settingsHtml}</div>
+    ${teamHtml(r.team || [])}`;
 
+  wireTeam(r.team || []);
   const vote = async v => {
     if (!me()) { toast('Log in to rate rooms.'); return; }
     try { await api('POST', `/api/rooms/${r.id}/vote`, { vote: r.my_vote === v ? 0 : v }); room(id); } catch (x) { toast(x.message); }
