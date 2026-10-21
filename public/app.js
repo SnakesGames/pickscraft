@@ -147,11 +147,12 @@ async function profileEdit() {
   catch (x) { app.innerHTML = `<div class="card empty">${esc(x.message)}</div>`; return; }
   let skin = p.avatar_color, shirt = p.shirt_color;
   const sw = sel => COLORS.map(c => `<button type="button" class="swatch${c.toLowerCase() === String(sel).toLowerCase() ? ' sel' : ''}" data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('');
-  app.innerHTML = `<div class="profile-head"><div id="prev">${avatar(p, true)}</div><div><h1>${esc(p.display_name)}</h1>
+  app.innerHTML = `<div class="profile-head"><div id="prev">${avatar(p, true)}</div><div><h1>${esc(p.display_name)} <span id="eqb">${badgeChip(p.badge)}</span></h1>
     <span class="tag">@${esc(p.username)}</span> <span class="tag">Level ${p.level}</span> <span class="tag">${p.xp} XP</span>
     <span class="tag token">${tokenIcon()} ${(p.tokens || 0).toLocaleString()} Tokens</span>
     <p class="hint"><a href="#/u/${esc(p.username)}">View public profile</a> &middot; <a href="#/creator">Creator dashboard</a></p></div></div>
   <div id="gifts"></div>
+  <div class="card"><h3>My badges</h3><p class="hint">Pick the badge that shows above your head in the game and next to your name.</p><div id="mybadges"><div class="empty">Loading&hellip;</div></div></div>
   <form class="card" id="pf"><div class="two"><div>
     <label for="dn">Display name</label><input id="dn" maxlength="32" value="${esc(p.display_name)}">
     <label for="bio">Bio</label><textarea id="bio" rows="4" maxlength="280">${esc(p.bio)}</textarea></div><div>
@@ -165,6 +166,24 @@ async function profileEdit() {
     document.getElementById('prev').innerHTML = avatar({ avatar_color: skin, shirt_color: shirt }, true);
   };
   pick('sk', c => skin = c); pick('sh', c => shirt = c);
+  let equipped = p.badge ? p.badge.id : null;
+  const drawBadges = list => {
+    const box = document.getElementById('mybadges');
+    box.innerHTML = list.length ? badgeGrid(list, equipped, true) + (equipped ? '<button type="button" class="btn small ghost" id="unequip">Show no badge</button>' : '')
+      : '<div class="empty">No badges yet. Admins give out badges for events, testing and more.</div>';
+    box.onclick = async e => {
+      const btn = e.target.closest('[data-badge]'), off = e.target.id === 'unequip';
+      if (!btn && !off) return;
+      const id = off ? null : +btn.dataset.badge;
+      try {
+        await api('POST', '/api/me/badge', { badge_id: id });
+        equipped = id; drawBadges(list);
+        document.getElementById('eqb').innerHTML = badgeChip(list.find(b => b.id === id));
+        toast(id ? 'Badge equipped! It shows in the game next time you join a room.' : 'Badge hidden');
+      } catch (x) { toast(x.message); }
+    };
+  };
+  api('GET', '/api/me/badges').then(drawBadges).catch(x => { document.getElementById('mybadges').innerHTML = `<div class="empty">${esc(x.message)}</div>`; });
   try {
     const gifts = await api('GET', '/api/me/gifts');
     if (gifts.length) document.getElementById('gifts').innerHTML = `<div class="card gift-note">${giftIcon()}<div><b>You have ${gifts.length === 1 ? 'a gift box' : gifts.length + ' gift boxes'} waiting!</b>
@@ -222,16 +241,31 @@ async function friends() {
   clearInterval(friends.t); friends.t = setInterval(() => location.hash === '#/friends' ? load() : clearInterval(friends.t), 20000);
 }
 
+// ---------- badges ----------
+const BADGE_EMOJI = { star: '⭐', crown: '👑', heart: '❤️', fire: '🔥', trophy: '🏆', sparkle: '✨', pickaxe: '⛏️', flag: '🚩', music: '🎵', smile: '😊',
+  thumbs: '👍', lol: '😂', mic: '🎤', create: '🛠️', token: '🪙', people: '👥', check: '✅', lock: '🔒', pin: '📍', play: '▶️' };
+const BADGE_COLORS = ['#FFD84D', '#FF7A2E', '#FF5470', '#FF6FA8', '#C04BF2', '#8B5CF6', '#338CF2', '#2EC4E8', '#3DDC84', '#B9F27C', '#FFFFFF', '#9AA0AE'];
+function badgeChip(b, extra = '') {
+  if (!b) return '';
+  return `<span class="badge-chip${extra}" style="--bc:${esc(b.color || '#FFD84D')}" title="${esc(b.description || b.name)}">${BADGE_EMOJI[b.icon] || '⭐'} ${esc(b.name)}</span>`;
+}
+function badgeGrid(list, equippedId, pickable) {
+  if (!list || !list.length) return '<div class="empty">No badges yet.</div>';
+  return `<div class="badge-grid">${list.map(b => `<${pickable ? 'button type="button"' : 'div'} class="badge-card${b.id === equippedId ? ' on' : ''}" data-badge="${b.id}" style="--bc:${esc(b.color)}">
+    <div class="badge-ico">${BADGE_EMOJI[b.icon] || '⭐'}</div><b>${esc(b.name)}</b><span>${esc(b.description || '')}</span>${b.id === equippedId ? '<em>Showing</em>' : pickable ? '<em class="dim">Click to show</em>' : ''}</${pickable ? 'button' : 'div'}>`).join('')}</div>`;
+}
+
 async function player(username) {
   let p;
   try { p = await api('GET', '/api/players/' + encodeURIComponent(username)); }
   catch { app.innerHTML = `<div class="card empty">No player called @${esc(username)}.</div>`; return; }
   const self = me()?.id === p.id;
-  app.innerHTML = `<div class="profile-head">${avatar(p, true)}<div><h1>${esc(p.display_name)}</h1>
+  app.innerHTML = `<div class="profile-head">${avatar(p, true)}<div><h1>${esc(p.display_name)} ${badgeChip(p.badge)}</h1>
     <span class="tag">@${esc(p.username)}</span> <span class="tag">Level ${p.level}</span>
     <span class="tag">Joined ${new Date(p.created_at).toLocaleDateString()}</span>
     <p>${esc(p.bio) || '<span class="hint">No bio yet.</span>'}</p>
     ${self ? `<a class="btn small" href="#/me">Edit profile</a>` : me() ? `<button class="btn small" id="addf">Add friend</button>` : ''}</div></div>
+    <h2>Badges <span class="hint">(${(p.badges || []).length})</span></h2>${badgeGrid(p.badges, p.badge ? p.badge.id : null, false)}
     <h2>Rooms by ${esc(p.display_name)}</h2>${roomCards(p.rooms)}`;
   const b = document.getElementById('addf');
   if (b) b.onclick = async () => {
@@ -514,7 +548,29 @@ async function admin() {
       <label for="amsg">Message</label><input id="amsg" maxlength="200" placeholder="Server restart in 5 minutes!" required>
       <div class="hint">Shows as a banner for everyone who's in the game right now (and on the website for a day).</div>
       <div class="error" id="nerr"></div><button class="btn">Announce</button>
-      <h3 style="margin-top:1.5em">Admin log</h3><div id="alog"><div class="empty">Loading&hellip;</div></div></form></div>`;
+      <h3 style="margin-top:1.5em">Admin log</h3><div id="alog"><div class="empty">Loading&hellip;</div></div></form></div>
+    <h2>Game status</h2><form class="card" id="gs">
+      <div id="gsnow" class="status-now">Loading&hellip;</div>
+      <div class="seg" id="gsmode">
+        <label><input type="radio" name="gsm" value="open" checked> Open</label>
+        <label><input type="radio" name="gsm" value="close"> Close now</label>
+        <label><input type="radio" name="gsm" value="schedule"> Close at a set time</label></div>
+      <label for="gsr">Reason (players see this on the login screen)</label><input id="gsr" maxlength="300" placeholder="Big update! Back soon.">
+      <div class="two"><div data-gs="schedule"><label for="gsc">Close at (Eastern time)</label><input id="gsc" type="datetime-local"></div>
+        <div data-gs="when"><label for="gso">Open again at (Eastern time, optional)</label><input id="gso" type="datetime-local"></div></div>
+      <div class="hint" id="gshint"></div>
+      <div class="error" id="gserr"></div><button class="btn" id="gsbtn">Save</button></form>
+    <h2>Badges</h2><div class="two">
+    <form class="card" id="bform"><h3 id="btitle">Make a badge</h3>
+      <label for="bn">Name (shown above heads)</label><input id="bn" maxlength="24" placeholder="Beta Tester" required>
+      <label for="bd">Description</label><input id="bd" maxlength="140" placeholder="Helped test Pickscraft before launch">
+      <label>Colour</label><div class="swatches" id="bc">${BADGE_COLORS.map((c, i) => `<button type="button" class="swatch${i ? '' : ' sel'}" data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')}</div>
+      <label>Icon</label><div class="icon-pick" id="bi">${Object.entries(BADGE_EMOJI).map(([k, e], i) => `<button type="button" class="${i ? '' : 'sel'}" data-i="${k}" title="${k}">${e}</button>`).join('')}</div>
+      <div class="hint">Preview: <span id="bprev"></span></div>
+      <div class="error" id="berr"></div><button class="btn" id="bsave">Create badge</button> <button type="button" class="btn ghost small" id="bcancel" hidden>Cancel edit</button></form>
+    <div class="card"><h3>All badges</h3>
+      <label for="bu">Give to / take from (username, or * for everyone)</label><input id="bu" maxlength="21" placeholder="username">
+      <div id="blist"><div class="empty">Loading&hellip;</div></div></div></div>`;
   const log = async () => {
     try {
       const rows = await api('GET', '/api/admin/gifts?limit=40');
@@ -581,6 +637,110 @@ async function admin() {
     catch (x) { $('nerr').textContent = x.message; } finally { btn.disabled = false; }
   };
   alog();
+
+  // ---- game status (open / closed / scheduled closing), times picked in Eastern time
+  let gsState = null, gsTimer = null;
+  const gsMode = () => document.querySelector('input[name=gsm]:checked').value;
+  const gsShow = () => {
+    const m = gsMode();
+    document.querySelector('[data-gs=schedule]').hidden = m !== 'schedule';
+    document.querySelector('[data-gs=when]').hidden = m === 'open';
+    $('gshint').textContent = { open: 'Players can log in and play.', close: 'Everyone who isn\'t an admin is sent back to the login screen within about 30 seconds and can\'t log in until it opens.',
+      schedule: 'Players in the game see a countdown, then get sent to the login screen when it closes.' }[m];
+    $('gsbtn').textContent = { open: 'Open the game', close: 'Close the game now', schedule: 'Schedule closing' }[m];
+  };
+  $('gsmode').onchange = gsShow; gsShow();
+  const gsDraw = () => {
+    if (!gsState) return;
+    const st = gsState, skew = new Date(st.server_time) - Date.now(), now = Date.now() + skew;
+    const left = t => { let s = Math.max(0, Math.round((new Date(t) - now) / 1000)); const d = Math.floor(s / 86400); s %= 86400;
+      return (d ? d + 'd ' : '') + [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(n => String(n).padStart(2, '0')).join(':'); };
+    const et = t => new Date(t).toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'medium', timeStyle: 'short' }) + ' ET';
+    let html;
+    if (!st.open) html = `<b class="bad">CLOSED</b>${st.reason ? ' &mdash; ' + esc(st.reason) : ''}` + (st.opens_at ? `<br>Opens ${et(st.opens_at)} &middot; in <b>${left(st.opens_at)}</b>` : '<br>Stays closed until you open it.');
+    else if (st.closes_at) html = `<b class="warn">CLOSING SOON</b>${st.reason ? ' &mdash; ' + esc(st.reason) : ''}<br>Closes ${et(st.closes_at)} &middot; in <b>${left(st.closes_at)}</b>` + (st.opens_at ? `<br>Opens again ${et(st.opens_at)}` : '');
+    else html = '<b class="good">OPEN</b> &mdash; players can log in.';
+    $('gsnow').innerHTML = html;
+  };
+  const gsLoad = async () => { try { gsState = await raw('GET', '/api/status'); gsDraw(); } catch (x) { $('gsnow').textContent = x.message; } };
+  clearInterval(admin.gsTimer); admin.gsTimer = setInterval(() => { if (location.hash !== '#/admin') return clearInterval(admin.gsTimer); gsDraw(); }, 1000);
+  $('gs').onsubmit = async e => {
+    e.preventDefault(); $('gserr').textContent = '';
+    const m = gsMode();
+    const body = { closed: m === 'close', reason: $('gsr').value.trim(), closes_at: null, opens_at: null };
+    try {
+      if (m === 'schedule') { if (!$('gsc').value) throw new Error('Pick when it closes.'); body.closes_at = easternToIso($('gsc').value); }
+      if (m !== 'open' && $('gso').value) body.opens_at = easternToIso($('gso').value);
+      if (m === 'close' && !confirm('Close the game for everyone who isn\'t an admin?')) return;
+      gsState = await api('POST', '/api/admin/command', { cmd: 'game_status', ...body });
+      gsDraw(); toast(m === 'open' ? 'The game is open.' : m === 'close' ? 'The game is closed.' : 'Closing scheduled.'); alog();
+    } catch (x) { $('gserr').textContent = x.message; }
+  };
+  gsLoad();
+
+  // ---- badges
+  let bcolor = BADGE_COLORS[0], bicon = 'star', editing = null, allBadges = [];
+  const bprev = () => { $('bprev').innerHTML = badgeChip({ name: $('bn').value || 'Badge', color: bcolor, icon: bicon }); };
+  const pickOne = (box, attr, set) => $(box).onclick = e => { const v = e.target.closest('button')?.dataset[attr]; if (!v) return; set(v);
+    [...$(box).children].forEach(b => b.classList.toggle('sel', b.dataset[attr] === v)); bprev(); };
+  pickOne('bc', 'c', v => bcolor = v); pickOne('bi', 'i', v => bicon = v);
+  $('bn').oninput = bprev; bprev();
+  const resetForm = () => { editing = null; $('bform').reset(); $('btitle').textContent = 'Make a badge'; $('bsave').textContent = 'Create badge'; $('bcancel').hidden = true;
+    bcolor = BADGE_COLORS[0]; bicon = 'star'; [...$('bc').children].forEach((b, i) => b.classList.toggle('sel', !i)); [...$('bi').children].forEach((b, i) => b.classList.toggle('sel', !i)); bprev(); };
+  $('bcancel').onclick = resetForm;
+  const blist = async () => {
+    try {
+      allBadges = await api('GET', '/api/badges');
+      $('blist').innerHTML = allBadges.length ? `<table class="tbl"><tbody>${allBadges.map(b => `<tr><td>${badgeChip(b)}<div class="hint" style="margin:2px 0 0">${esc(b.description)}</div></td>
+        <td>${fmt(b.owners)} ${b.owners === 1 ? 'player' : 'players'}</td>
+        <td class="row-btns"><button class="btn small" data-act="give" data-id="${b.id}">Give</button><button class="btn small ghost" data-act="take" data-id="${b.id}">Take</button>
+        <button class="btn small ghost" data-act="edit" data-id="${b.id}">Edit</button><button class="btn small danger" data-act="del" data-id="${b.id}">Delete</button></td></tr>`).join('')}</tbody></table>`
+        : '<div class="empty">No badges yet - make one on the left.</div>';
+    } catch (x) { $('blist').innerHTML = `<div class="empty">${esc(x.message)}</div>`; }
+  };
+  $('blist').onclick = async e => {
+    const btn = e.target.closest('button[data-act]'); if (!btn) return;
+    const id = +btn.dataset.id, b = allBadges.find(x => x.id === id), act = btn.dataset.act, username = $('bu').value.trim();
+    if (act === 'edit') {
+      editing = id; $('bn').value = b.name; $('bd').value = b.description; bcolor = b.color; bicon = b.icon;
+      [...$('bc').children].forEach(x => x.classList.toggle('sel', x.dataset.c.toLowerCase() === b.color.toLowerCase()));
+      [...$('bi').children].forEach(x => x.classList.toggle('sel', x.dataset.i === b.icon));
+      $('btitle').textContent = 'Edit "' + b.name + '"'; $('bsave').textContent = 'Save changes'; $('bcancel').hidden = false; bprev(); $('bform').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    if (act === 'del' && !confirm(`Delete the "${b.name}" badge? Everyone who has it loses it.`)) return;
+    if ((act === 'give' || act === 'take') && !username) { toast('Type a username first (or * to give it to everyone).'); $('bu').focus(); return; }
+    if (act === 'give' && username === '*' && !confirm(`Give "${b.name}" to EVERY player?`)) return;
+    try {
+      const r = await api('POST', '/api/admin/command', { cmd: { give: 'give_badge', take: 'take_badge', del: 'delete_badge' }[act], id, username });
+      toast(act === 'give' ? `Gave "${b.name}" to ${r.given} player${r.given === 1 ? '' : 's'}.` : act === 'take' ? `Took "${b.name}" from @${username}.` : 'Badge deleted.');
+      blist(); alog();
+    } catch (x) { toast(x.message); }
+  };
+  $('bform').onsubmit = async e => {
+    e.preventDefault(); $('berr').textContent = '';
+    const body = { name: $('bn').value.trim(), description: $('bd').value.trim(), color: bcolor, icon: bicon };
+    try {
+      if (editing) await api('POST', '/api/admin/command', { cmd: 'edit_badge', id: editing, ...body });
+      else await api('POST', '/api/admin/command', { cmd: 'create_badge', ...body });
+      toast(editing ? 'Badge saved.' : `Badge "${body.name}" created! Now give it to someone.`); resetForm(); blist(); alog();
+    } catch (x) { $('berr').textContent = x.message; }
+  };
+  blist();
+}
+
+/** "2026-10-21T15:00" picked as US Eastern time (EST/EDT) -> UTC ISO string. */
+function easternToIso(local) {
+  const [d, t] = local.split('T'); const [y, mo, da] = d.split('-').map(Number); const [h, mi] = t.split(':').map(Number);
+  const wall = Date.UTC(y, mo - 1, da, h, mi);
+  let guess = wall;
+  for (let i = 0; i < 3; i++) {
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+      .formatToParts(new Date(guess)).map(x => [x.type, x.value]));
+    const shown = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute);
+    guess += wall - shown;
+  }
+  return new Date(guess).toISOString();
 }
 
 // ---------- router ----------
@@ -620,6 +780,15 @@ fetch(API + '/api/health').then(r => r.json()).then(h => { serverReady = !!h.con
 updateNav();
 addEventListener('hashchange', route);
 route();
+// Game closed / closing soon banner
+raw('GET', '/api/status').then(st => {
+  if (!st || (st.open && !st.closes_at)) return;
+  const el = document.getElementById('status-banner'); if (!el) return;
+  const et = t => new Date(t).toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'medium', timeStyle: 'short' }) + ' ET';
+  el.innerHTML = st.open ? `&#9888; The game closes ${et(st.closes_at)}${st.reason ? ' &mdash; ' + esc(st.reason) : ''}`
+    : `&#128295; The game is closed right now${st.reason ? ': ' + esc(st.reason).replace(/[.!?]?$/, m => m || '.') : '.'}${st.opens_at ? ' Back ' + et(st.opens_at) + '.' : ''}`;
+  el.hidden = false;
+}).catch(() => {});
 // Admin announcements from the last day
 raw('GET', '/api/announcements').then(rows => {
   const a = rows && rows[0], el = document.getElementById('announce');

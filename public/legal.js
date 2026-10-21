@@ -11,8 +11,8 @@ export const LEGAL = {
   name: 'Pickscraft Network',
   site: 'www.pickscraft.net',
   // Fill these in before you publish:
-  contact: 'support@pickscraft.net',          // e.g. 'support@pickscraft.net' - where people send privacy requests and questions
-  law: 'the State of New York, USA',              // e.g. 'the State of New York, USA' - whose laws govern the Terms
+  contact: '',          // e.g. 'support@pickscraft.net' - where people send privacy requests and questions
+  law: '',              // e.g. 'the State of New York, USA' - whose laws govern the Terms
   minAge: 13
 };
 
@@ -53,6 +53,9 @@ If anything is unclear, contact us at ${c}.</p>
 <h2>2. Information collected when you play</h2>
 <ul>
   <li><b>Game progress:</b> your level, XP, and Tokens (our in-game currency), gifts of Tokens sent to you, and the avatar items you've bought or been given.</li>
+  <li><b>Voice chat:</b> if you turn on your microphone (push-to-talk or open mic), your voice is sent live through Photon, our multiplayer
+    provider, to the other players in your room, who hear it louder when they're near you. We don't record, store or listen to voice chat.
+    You can turn your mic off, mute other players, or turn voice chat off completely in Settings &rsaquo; Audio.</li>
   <li><b>Your avatar:</b> the outfit and colours you pick, saved to your account so they follow you to other devices. Other players see your avatar in the game.</li>
   <li><b>Online status:</b> while you're signed in, the game tells our server every so often that you're online, which room you're in,
     whether that room is private, and whether you're playing on desktop, VR or mobile. This is replaced each time and is used for your friends list.</li>
@@ -97,6 +100,7 @@ If anything is unclear, contact us at ${c}.</p>
   <li><b>Room creators:</b> visit totals for their rooms (not who visited), and the co-owners they've added.</li>
   <li><b>Admins:</b> the people who run ${LEGAL.name} can see account information when needed to run the Service, handle reports, send Tokens or items, and mute or ban accounts.
     Admin actions (who did what, to which account, and why) are recorded in an admin log that only admins can see.</li>
+  <li><b>Badges:</b> the badges you've been given (and the one you choose to show) are public on your profile and above your head in the game.</li>
   <li>Your email address is never shown to other players.</li>
 </ul>
 
@@ -115,6 +119,7 @@ to protect the safety of players or the public, or as part of a sale or transfer
 <h2>7. How long we keep information</h2>
 <ul>
   <li>Account, profile, friends, rooms and game progress: until you delete them or ask us to delete your account.</li>
+  <li>Voice chat: not stored at all - it's streamed live and gone once it's played.</li>
   <li>Online status: replaced every time the game updates it, and counted as offline after about 90 seconds.</li>
   <li>Room invites: deleted within about a day.</li>
   <li>Room visit records: kept so creators can see their history; deleted if the room is deleted.</li>
@@ -179,6 +184,7 @@ ${LEGAL.site} (the "Service"). By creating an account or using the Service you a
 <p>${LEGAL.name} is a place to hang out, play and build together. When you use it, you agree <b>not</b> to:</p>
 <ul>
   <li>Harass, bully, threaten or bother other players, or encourage others to do so.</li>
+  <li>Use voice chat to scream, play loud noises or music, or say anything you couldn't type in text chat.</li>
   <li>Post or build anything hateful, sexual, violent or graphic, or anything that sexualises or endangers minors in any way.</li>
   <li>Share anyone's personal information (including your own), such as real names, addresses, phone numbers, passwords or photos.</li>
   <li>Ask other players for personal information, or try to move them to other apps to talk privately.</li>

@@ -967,6 +967,168 @@ insert into public.shop_items (key, name, slot, price) values
   ('back_dragon', 'Dragon Wings', 'back', 500)
 on conflict (key) do update set name = excluded.name, slot = excluded.slot, price = excluded.price, active = true;
 
+-- ============ BADGES: admins make badges and give them to players; players pick one to show above their head ============
+create table if not exists public.badges (
+  id          bigint generated always as identity primary key,
+  name        text not null check (char_length(name) between 1 and 24),
+  description text not null default '' check (char_length(description) <= 140),
+  color       text not null default '#FFD84D' check (color ~ '^#[0-9A-Fa-f]{6}$'),
+  icon        text not null default 'star' check (icon ~ '^[a-z]{2,16}$'),
+  created_by  uuid references public.profiles(id) on delete set null,
+  created_at  timestamptz not null default now()
+);
+alter table public.badges enable row level security;
+drop policy if exists "anyone sees badges" on public.badges;
+create policy "anyone sees badges" on public.badges for select using (true);
+revoke insert, update, delete on public.badges from anon, authenticated;
+grant select on public.badges to anon, authenticated;
+
+create table if not exists public.user_badges (
+  user_id  uuid not null references public.profiles(id) on delete cascade,
+  badge_id bigint not null references public.badges(id) on delete cascade,
+  given_by uuid references public.profiles(id) on delete set null,
+  given_at timestamptz not null default now(),
+  primary key (user_id, badge_id)
+);
+alter table public.user_badges enable row level security;
+drop policy if exists "anyone sees who has badges" on public.user_badges;
+create policy "anyone sees who has badges" on public.user_badges for select using (true);
+revoke insert, update, delete on public.user_badges from anon, authenticated;
+grant select on public.user_badges to anon, authenticated;
+
+-- the badge shown above your head (must be one you own - set through equip_badge)
+alter table public.profiles add column if not exists equipped_badge bigint references public.badges(id) on delete set null;
+
+create or replace function public.equip_badge(p_badge bigint) returns void
+language plpgsql security definer set search_path = public as $$
+declare me uuid := auth.uid();
+begin
+  if me is null then raise exception 'Log in first.'; end if;
+  if p_badge is not null and not exists (select 1 from public.user_badges ub where ub.user_id = me and ub.badge_id = p_badge) then
+    raise exception 'You don''t have that badge.';
+  end if;
+  update public.profiles pr set equipped_badge = p_badge where pr.id = me;
+end $$;
+
+create or replace function public.admin_create_badge(p_name text, p_description text, p_color text, p_icon text) returns bigint
+language plpgsql security definer set search_path = public as $$
+declare me uuid := public.require_admin(); v bigint;
+begin
+  insert into public.badges (name, description, color, icon, created_by)
+  values (trim(p_name), coalesce(trim(p_description), ''), upper(coalesce(p_color, '#FFD84D')), lower(coalesce(p_icon, 'star')), me) returning id into v;
+  insert into public.admin_log (admin_id, action, target, detail) values (me, 'create_badge', p_name, p_color || ' ' || p_icon);
+  return v;
+end $$;
+
+create or replace function public.admin_update_badge(p_badge bigint, p_name text, p_description text, p_color text, p_icon text) returns void
+language plpgsql security definer set search_path = public as $$
+declare me uuid := public.require_admin();
+begin
+  update public.badges b set name = trim(p_name), description = coalesce(trim(p_description), ''), color = upper(p_color), icon = lower(p_icon) where b.id = p_badge;
+  if not found then raise exception 'No such badge.'; end if;
+  insert into public.admin_log (admin_id, action, target, detail) values (me, 'edit_badge', p_name, '');
+end $$;
+
+create or replace function public.admin_delete_badge(p_badge bigint) returns void
+language plpgsql security definer set search_path = public as $$
+declare me uuid := public.require_admin(); v_name text;
+begin
+  delete from public.badges b where b.id = p_badge returning b.name into v_name;
+  if v_name is null then raise exception 'No such badge.'; end if;
+  insert into public.admin_log (admin_id, action, target) values (me, 'delete_badge', v_name);
+end $$;
+
+-- Give a badge ('*' = everyone). New owners who have nothing equipped get it equipped straight away.
+create or replace function public.admin_give_badge(p_username text, p_badge bigint) returns int
+language plpgsql security definer set search_path = public as $$
+declare me uuid := public.require_admin(); n int; v_name text;
+begin
+  select b.name into v_name from public.badges b where b.id = p_badge;
+  if v_name is null then raise exception 'No such badge.'; end if;
+  if p_username = '*' then
+    insert into public.user_badges (user_id, badge_id, given_by) select pr.id, p_badge, me from public.profiles pr on conflict do nothing;
+    get diagnostics n = row_count;
+    update public.profiles pr set equipped_badge = p_badge where pr.equipped_badge is null;
+  else
+    insert into public.user_badges (user_id, badge_id, given_by) values (public.admin_find(p_username), p_badge, me) on conflict do nothing;
+    get diagnostics n = row_count;
+    update public.profiles pr set equipped_badge = p_badge where pr.id = public.admin_find(p_username) and pr.equipped_badge is null;
+  end if;
+  insert into public.admin_log (admin_id, action, target, detail) values (me, 'give_badge', p_username, v_name);
+  return n;
+end $$;
+
+create or replace function public.admin_take_badge(p_username text, p_badge bigint) returns void
+language plpgsql security definer set search_path = public as $$
+declare me uuid := public.require_admin(); v uuid := public.admin_find(p_username); v_name text;
+begin
+  select b.name into v_name from public.badges b where b.id = p_badge;
+  delete from public.user_badges ub where ub.user_id = v and ub.badge_id = p_badge;
+  update public.profiles pr set equipped_badge = null where pr.id = v and pr.equipped_badge = p_badge;
+  insert into public.admin_log (admin_id, action, target, detail) values (me, 'take_badge', p_username, coalesce(v_name, p_badge::text));
+end $$;
+
+revoke execute on function public.equip_badge(bigint), public.admin_create_badge(text, text, text, text), public.admin_update_badge(bigint, text, text, text, text),
+  public.admin_delete_badge(bigint), public.admin_give_badge(text, bigint), public.admin_take_badge(text, bigint) from public, anon;
+grant execute on function public.equip_badge(bigint), public.admin_create_badge(text, text, text, text), public.admin_update_badge(bigint, text, text, text, text),
+  public.admin_delete_badge(bigint), public.admin_give_badge(text, bigint), public.admin_take_badge(text, bigint) to authenticated;
+
+-- ============ GAME STATUS: admins can close the game (now or at a set time) with a reason, and set when it opens again ============
+create table if not exists public.game_status (
+  id         int primary key default 1 check (id = 1),
+  closed     boolean not null default false,        -- closed right now (until opens_at, if set)
+  reason     text not null default '' check (char_length(reason) <= 300),
+  closes_at  timestamptz,                           -- closes automatically at this time (countdown in the game)
+  opens_at   timestamptz,                           -- opens again automatically at this time (countdown on the login screen)
+  updated_by uuid references public.profiles(id) on delete set null,
+  updated_at timestamptz not null default now()
+);
+insert into public.game_status (id) values (1) on conflict do nothing;
+alter table public.game_status enable row level security;
+drop policy if exists "anyone reads the game status" on public.game_status;
+create policy "anyone reads the game status" on public.game_status for select using (true);
+revoke insert, update, delete on public.game_status from anon, authenticated;
+grant select on public.game_status to anon, authenticated;
+
+-- Is the game closed to players right now?
+create or replace function public.game_is_closed() returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select (s.opens_at is null or now() < s.opens_at)
+                          and (s.closed or (s.closes_at is not null and now() >= s.closes_at))
+                     from public.game_status s where s.id = 1), false);
+$$;
+
+create or replace function public.get_game_status() returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object('open', not public.game_is_closed(), 'closed_flag', s.closed, 'reason', s.reason,
+         'closes_at', s.closes_at, 'opens_at', s.opens_at, 'server_time', now(), 'updated_at', s.updated_at)
+    from public.game_status s where s.id = 1;
+$$;
+
+-- p_closed: close now (true) or open now (false). p_closes_at: schedule a closing (only used when p_closed is false).
+-- p_opens_at: when it opens again (null = until an admin opens it).
+create or replace function public.admin_set_game_status(p_closed boolean, p_reason text, p_closes_at timestamptz, p_opens_at timestamptz) returns json
+language plpgsql security definer set search_path = public as $$
+declare me uuid := public.require_admin();
+begin
+  if p_opens_at is not null and p_opens_at <= now() then raise exception 'The opening time is in the past.'; end if;
+  if p_closes_at is not null and p_closes_at <= now() then raise exception 'The closing time is in the past.'; end if;
+  if p_closes_at is not null and p_opens_at is not null and p_opens_at <= p_closes_at then raise exception 'The game has to open again after it closes.'; end if;
+  update public.game_status s set closed = p_closed, reason = left(coalesce(trim(p_reason), ''), 300),
+         closes_at = case when p_closed then null else p_closes_at end,
+         opens_at = case when p_closed or p_closes_at is not null then p_opens_at else null end,
+         updated_by = me, updated_at = now()
+   where s.id = 1;
+  insert into public.admin_log (admin_id, action, detail)
+  values (me, case when p_closed then 'close_game' when p_closes_at is not null then 'schedule_close' else 'open_game' end,
+          left(coalesce(p_reason, ''), 120) || coalesce(' | closes ' || p_closes_at::text, '') || coalesce(' | opens ' || p_opens_at::text, ''));
+  return public.get_game_status();
+end $$;
+
+revoke execute on function public.admin_set_game_status(boolean, text, timestamptz, timestamptz) from public, anon;
+grant execute on function public.game_is_closed(), public.get_game_status() to anon, authenticated;
+grant execute on function public.admin_set_game_status(boolean, text, timestamptz, timestamptz) to authenticated;
+
 -- ============ FUNCTION PERMISSIONS ============
 revoke execute on all functions in schema public from public, anon;
 -- citext (used for usernames) keeps working for everyone: the line above must not lock its built-in functions.
@@ -991,3 +1153,7 @@ grant execute on function public.buy_item(text), public.require_admin(), public.
   public.admin_take_item(text, text), public.admin_announce(text), public.admin_set_admin(text, boolean), public.admin_lookup(text),
   public.admin_recent_log(int) to authenticated;
 grant update (display_name, bio, avatar_color, shirt_color, look) on public.profiles to authenticated;
+grant execute on function public.equip_badge(bigint), public.admin_create_badge(text, text, text, text), public.admin_update_badge(bigint, text, text, text, text),
+  public.admin_delete_badge(bigint), public.admin_give_badge(text, bigint), public.admin_take_badge(text, bigint) to authenticated;
+grant execute on function public.game_is_closed(), public.get_game_status() to anon, authenticated;
+grant execute on function public.admin_set_game_status(boolean, text, timestamptz, timestamptz) to authenticated;

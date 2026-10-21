@@ -126,3 +126,32 @@ h1 .ticon { width: 34px; height: 34px; vertical-align: -5px; }
 .footer a { color: var(--muted); }
 label.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: 14px; color: var(--muted); margin: 12px 0 4px; line-height: 1.45; }
 label.check input { width: auto; margin-top: 3px; flex: none; }
+
+/* badges */
+.badge-chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 800; vertical-align: middle;
+  background: color-mix(in srgb, var(--bc) 22%, transparent); color: var(--bc); border: 1px solid color-mix(in srgb, var(--bc) 55%, transparent); }
+h1 .badge-chip { font-size: 15px; }
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin: 8px 0 18px; }
+.badge-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 14px 10px; border-radius: 16px; font: inherit; color: var(--text);
+  background: var(--panel); border: 2px solid color-mix(in srgb, var(--bc) 35%, transparent); }
+button.badge-card { cursor: pointer; }
+button.badge-card:hover { border-color: var(--bc); }
+.badge-card.on { border-color: var(--bc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--bc) 25%, transparent); }
+.badge-card .badge-ico { font-size: 30px; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--bc) 25%, transparent); }
+.badge-card b { color: var(--bc); }
+.badge-card span { font-size: 13px; color: var(--muted); }
+.badge-card em { font-size: 12px; font-style: normal; font-weight: 800; color: var(--bc); }
+.badge-card em.dim { color: var(--muted); font-weight: 600; }
+.icon-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.icon-pick button { width: 40px; height: 40px; border-radius: 10px; border: 2px solid transparent; background: var(--panel2); font-size: 20px; cursor: pointer; }
+.icon-pick button.sel { border-color: var(--accent, #e8641f); }
+.row-btns { white-space: nowrap; }
+.row-btns .btn { margin: 2px; }
+.btn.danger { background: #c2324f; }
+
+.status-now { padding: 12px 14px; border-radius: 12px; background: var(--panel2); margin-bottom: 12px; line-height: 1.6; }
+.status-now .bad { color: var(--bad); } .status-now .good { color: var(--good); } .status-now .warn { color: #ffd84d; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.seg label { display: inline-flex; align-items: center; gap: 6px; background: var(--panel2); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-weight: 700; margin: 0; }
+.seg input[type=radio] { width: auto; margin: 0; padding: 0; box-shadow: none; background: none; accent-color: var(--accent); }
+.seg label { white-space: nowrap; }
