@@ -1,8 +1,8 @@
 {
-  "version": "0.0.0",
-  "url": "PickscraftNetwork-0.0.0.zip",
-  "sha256": "",
-  "size": 0,
-  "exe": "Pickscraft Network.exe",
-  "notes": "Placeholder - run Launcher/make-release.ps1 after building the game to publish a real version."
+    "version":  "0.1.0",
+    "url":  "https://github.com/SnakesGames/pickscraft/releases/download/v0.1.0/PickscraftNetwork-0.1.0.zip",
+    "sha256":  "70223F9748138574CD27191D970E13F8A9F2A5BD88BF8CE5AC236F64EA2C059B",
+    "size":  48605600,
+    "exe":  "Pickscraft Network.exe",
+    "notes":  "First release: voice chat, badges, avatar shop, player cards and more."
 }
